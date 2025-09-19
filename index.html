@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!DOCTYPE html>
-<html lang="en">
-<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Yearly Vs Monthly Price Comparison Calculator</title>
@@ -52,12 +49,11 @@
     <a href="Multi_year_Contracts_Cost_Calculator.html" class="nav-btn">Multi-Year Contracts</a>
     <a href="Implementation_Service_Cost_Calculator.html" class="nav-btn">Implementation Service</a>
   </div>
-
-  <h1>Yearly Vs Monthly Price Comparison Calculator</h1>
-  <!-- Your existing content/calculator code goes here -->
-
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Odoo Price Comparison & Savings Calculator</title>
@@ -547,7 +543,7 @@
     <div class="modal-content p-4 md:p-6">
         <span class="modal-close">&times;</span>
         <h2 class="text-3xl sm:text-4xl font-black text-gray-800 text-center mb-6">
-            Plan Comparison
+            Standard Vs Custom Plan Comparison
         </h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -564,7 +560,7 @@
                 <div class="bg-purple-50 rounded-lg p-2 md:p-3 mb-3 text-sm sm:text-base">
                     <h5 class="font-bold text-lg sm:text-xl mb-2 text-purple-700">First-Year Pricing Breakdown</h5>
                     <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
-                        <span>Base Price for <span id="standard-first-year-user-count"></span> Users:</span>
+                        <span>Base Price:</span>
                         <span id="compare-standard-first-year-base-price" class="font-semibold"></span>
                     </div>
                     <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
@@ -589,7 +585,7 @@
                 <div class="bg-purple-100 rounded-lg p-2 md:p-3 mb-3 text-sm sm:text-base">
                     <h5 class="font-bold text-lg sm:text-xl mb-2 text-purple-700">Renewal Pricing Breakdown</h5>
                     <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
-                        <span>Base Price for <span id="standard-renewal-user-count"></span> Users:</span>
+                        <span>Base Price:</span>
                         <span id="compare-standard-renewal-base-price" class="font-semibold"></span>
                     </div>
                     <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
@@ -609,15 +605,11 @@
                 <div class="bg-purple-200 rounded-lg p-2 md:p-3 text-base sm:text-lg">
                     <h5 class="font-bold text-purple-700 mb-2">Effective Costs (Excl. Taxes):</h5>
                     <div class="flex justify-between items-center mb-2 text-sm sm:text-base">
-                        <span>Base Price (Excl. GST) per User:</span>
-                        <span id="compare-standard-per-user-base-price" class="font-black"></span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2 text-sm sm:text-base">
-                        <span>First Year / User / Month:</span>
+                        <span class="font-semibold text-gray-800">First Year / User / Month:</span>
                         <span id="compare-standard-per-user-first-year" class="font-black"></span>
                     </div>
                     <div class="flex justify-between items-center text-sm sm:text-base">
-                        <span>Renewal / User / Month:</span>
+                        <span class="font-semibold text-gray-800">Renewal / User / Month:</span>
                         <span id="compare-standard-per-user-renewal" class="font-black"></span>
                     </div>
                 </div>
@@ -639,7 +631,7 @@
                 <div class="bg-purple-50 rounded-lg p-2 md:p-3 mb-3 text-sm sm:text-base">
                     <h5 class="font-bold text-lg sm:text-xl mb-2 text-purple-700">First-Year Pricing Breakdown</h5>
                     <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
-                        <span>Base Price for <span id="custom-first-year-user-count"></span> Users:</span>
+                        <span>Base Price:</span>
                         <span id="compare-custom-first-year-base-price" class="font-semibold"></span>
                     </div>
                     <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
@@ -664,7 +656,7 @@
                 <div class="bg-purple-100 rounded-lg p-2 md:p-3 mb-3 text-sm sm:text-base">
                     <h5 class="font-bold text-lg sm:text-xl mb-2 text-purple-700">Renewal Pricing Breakdown</h5>
                     <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
-                        <span>Base Price for <span id="custom-renewal-user-count"></span> Users:</span>
+                        <span>Base Price:</span>
                         <span id="compare-custom-renewal-base-price" class="font-semibold"></span>
                     </div>
                     <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
@@ -684,15 +676,11 @@
                 <div class="bg-purple-200 rounded-lg p-2 md:p-3 text-base sm:text-lg">
                     <h5 class="font-bold text-purple-700 mb-2">Effective Costs (Excl. Taxes):</h5>
                     <div class="flex justify-between items-center mb-2 text-sm sm:text-base">
-                        <span>Base Price (Excl. GST) per User:</span>
-                        <span id="compare-custom-per-user-base-price" class="font-black"></span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2 text-sm sm:text-base">
-                        <span>First Year / User / Month:</span>
+                        <span class="font-semibold text-gray-800">First Year / User / Month:</span>
                         <span id="compare-custom-per-user-first-year" class="font-black"></span>
                     </div>
                     <div class="flex justify-between items-center text-sm sm:text-base">
-                        <span>Renewal / User / Month:</span>
+                        <span class="font-semibold text-gray-800">Renewal / User / Month:</span>
                         <span id="compare-custom-per-user-renewal" class="font-black"></span>
                     </div>
                 </div>
@@ -984,11 +972,6 @@
         const customRenewalPerUserPerMonth = (customRenewalPriceExclTax / 12) / numUsers;
         
         // Update Modal UI
-        document.getElementById('standard-first-year-user-count').textContent = numUsers;
-        document.getElementById('standard-renewal-user-count').textContent = numUsers;
-        document.getElementById('custom-first-year-user-count').textContent = numUsers;
-        document.getElementById('custom-renewal-user-count').textContent = numUsers;
-
         // Standard First Year
         const standardFirstYearDiscountPercent = (Math.abs(pricingData.standard.yearly.discount) / pricingData.standard.yearly.base) * 100;
         document.getElementById('compare-standard-first-year-base-price').textContent = formatCurrency(standardFirstYearBase);
@@ -1002,12 +985,9 @@
         document.getElementById('compare-standard-renewal-discount').textContent = formatCurrency(0) + ' (0.0%)';
         document.getElementById('compare-standard-renewal-tax').textContent = formatCurrency(standardRenewalTax);
         document.getElementById('compare-standard-renewal-total-price').textContent = formatCurrency(standardRenewalTotalPrice);
-        
-        // Standard Effective Costs
-        document.getElementById('compare-standard-per-user-base-price').textContent = formatCurrency(pricingData.standard.yearly.base);
         document.getElementById('compare-standard-per-user-first-year').textContent = formatCurrency(standardFirstYearPerUserPerMonth);
         document.getElementById('compare-standard-per-user-renewal').textContent = formatCurrency(standardRenewalPerUserPerMonth);
-
+        
         // Custom First Year
         const customFirstYearDiscountPercent = (Math.abs(pricingData.custom.yearly.discount) / pricingData.custom.yearly.base) * 100;
         document.getElementById('compare-custom-first-year-base-price').textContent = formatCurrency(customFirstYearBase);
@@ -1021,9 +1001,6 @@
         document.getElementById('compare-custom-renewal-discount').textContent = formatCurrency(0) + ' (0.0%)';
         document.getElementById('compare-custom-renewal-tax').textContent = formatCurrency(customRenewalTax);
         document.getElementById('compare-custom-renewal-total-price').textContent = formatCurrency(customRenewalTotalPrice);
-        
-        // Custom Effective Costs
-        document.getElementById('compare-custom-per-user-base-price').textContent = formatCurrency(pricingData.custom.yearly.base);
         document.getElementById('compare-custom-per-user-first-year').textContent = formatCurrency(customFirstYearPerUserPerMonth);
         document.getElementById('compare-custom-per-user-renewal').textContent = formatCurrency(customRenewalPerUserPerMonth);
     }
@@ -1145,4 +1122,3 @@
 
 </body>
 </html>
-
