@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo Price Comparison & Savings Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --ios-blue: #0A84FF;
+            --ios-purple: #9B2DE4;
+            --ios-teal: #63E6E8;
+            --ios-orange: #FF9F0A;
+            --ios-red: #FF3B30;
+            --professional-highlight: #63E6E8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #A8BFFF 0%, #D4A8FF 100%);
+            min-height: 100vh;
+            color: #1a1a1a;
+        }
+
+        /* Redesigned Glass morphism styling based on iOS 18 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .animated-gradient {
+            background: linear-gradient(-45deg, var(--ios-blue), var(--ios-purple), var(--ios-teal), var(--ios-orange));
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .pulse-ring {
+            animation: pulseRing 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+        }
+
+        @keyframes pulseRing {
+            0% { transform: scale(0.8); opacity: 1; }
+            80%, 100% { transform: scale(1.2); opacity: 0; }
+        }
+
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .slide-in-up {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .number-input {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .number-input:focus {
+            background: white;
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.1);
+        }
+        
+        /* New button toggle style */
+        .plan-toggle-container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 999px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+        }
+        .plan-toggle-bg {
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+            border-radius: 999px;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .plan-toggle-bg.right {
+            transform: translateX(calc(100% + 4px));
+            background: linear-gradient(135deg, var(--ios-purple), var(--ios-teal));
+        }
+
+        .plan-toggle-btn {
+            z-index: 1;
+            padding: 10px 24px;
+            border-radius: 999px;
+            transition: color 0.3s ease;
+        }
+        .plan-toggle-btn.active {
+            color: white;
+        }
+        .plan-toggle-btn.inactive {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* Updated professional savings card theme */
+        .savings-card {
+            background: linear-gradient(135deg, #1f2937, #334155);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .savings-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 8s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-card {
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            color: #1a1a1a;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .contact-card a {
+            background: rgba(255, 255, 255, 0.6);
+            color: #1a1a1a;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-label {
+            position: absolute;
+            top: -8px;
+            left: 12px;
+            background: white;
+            padding: 0 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--ios-blue);
+            border-radius: 999px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .loss-highlight {
+            background: linear-gradient(135deg, #FFEBEB, #FFCACA);
+            border: 2px solid #FF3B30;
+            color: #B30000;
+        }
+
+        .loss-text {
+            color: #B30000;
+            font-weight: bold;
+        }
+        
+        /* Modal and comparison view styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            width: 90%;
+            max-width: 1200px;
+            animation: slideInUp 0.6s ease-out;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-close {
+            color: #aaa;
+            float: right;
+            font-size: 2.5rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .modal-close:hover,
+        .modal-close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+<div class="min-h-screen py-6 px-3 md:py-8 md:px-4">
+    
+    <!-- Floating Header -->
+    <header class="text-center mb-8 floating">
+        <div class="inline-block">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black mb-3 text-white drop-shadow-lg">
+                Odoo Yearly VS Monthly Cost Comparison Calculator
+            </h1>
+            <div class="h-1 w-24 mx-auto animated-gradient rounded-full mb-4"></div>
+            <p class="text-lg sm:text-xl lg:text-2xl text-white/80 font-medium">
+                Compare plans, maximize savings, optimize your investment
+            </p>
+        </div>
+    </header>
+    
+    <!-- Button container with flex-wrap for mobile -->
+    <div class="flex flex-col md:flex-row justify-center items-center gap-3 text-center mb-6 flex-wrap">
+        <!-- New Compare Plans Button -->
+        <button id="compare-plans-btn" 
+                class="px-5 py-2 md:px-6 md:py-3 rounded-xl font-bold text-white text-base md:text-lg transition-all duration-300 hover:scale-105 glow-effect"
+                style="background: linear-gradient(135deg, var(--ios-teal), var(--ios-purple));">
+            ⚖️ Compare Standard and Custom Plans
+        </button>
+
+        <!-- New Year Toggle -->
+        <button id="year-toggle-btn" 
+                class="px-5 py-2 md:px-6 md:py-3 rounded-xl font-bold text-white text-base md:text-lg transition-all duration-300 hover:scale-105 glow-effect"
+                style="background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));">
+            🔄 Show Renewal Pricing
+        </button>
+    </div>
+
+    <!-- Main Calculator -->
+    <div class="glass-card rounded-2xl p-6 md:p-8 mb-6 hover-lift slide-in-up">
+        
+        <!-- Controls Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            
+            <!-- User Input -->
+            <div class="input-group">
+                <label class="input-label">Number of Users</label>
+                <input type="number" id="num-users" value="10" min="1" 
+                        class="number-input w-full px-5 py-3 rounded-xl text-lg sm:text-xl lg:text-2xl font-semibold outline-none">
+                <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div class="w-2 h-2 bg-green-400 rounded-full pulse-ring"></div>
+                </div>
+                <div id="input-error" class="text-red-500 text-xs mt-2 pl-2"></div>
+            </div>
+
+            <!-- Plan Toggle -->
+            <div class="flex justify-center">
+                <div class="plan-toggle-container">
+                    <div id="plan-toggle-bg" class="plan-toggle-bg"></div>
+                    <button id="standard-plan-btn" 
+                            class="plan-toggle-btn font-bold text-base md:text-lg active">
+                        ✨ Standard
+                    </button>
+                    <button id="custom-plan-btn" 
+                            class="plan-toggle-btn font-bold text-base md:text-lg inactive">
+                        🚀 Custom
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Cards -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+            
+            <!-- Yearly Plan -->
+            <div class="glass-dark rounded-2xl p-5 md:p-6 hover-lift border-2 border-green-200">
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h3 class="text-2xl sm:text-3xl font-black text-gray-800">💎 Yearly Plan</h3>
+                        <p class="text-base sm:text-lg font-semibold text-green-600">Best Value • Save Big</p>
+                    </div>
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <span class="text-xl">💰</span>
+                    </div>
+                </div>
+                
+                <div class="space-y-3 text-base sm:text-lg">
+                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                        <span class="font-semibold text-gray-700">Base Price (Excl. Taxes)</span>
+                        <span id="yearly-base-price" class="font-bold"></span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                        <span class="font-semibold text-green-600" id="yearly-discount-label">Discount</span>
+                        <span id="yearly-discount" class="font-bold text-green-600"></span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b-2 border-gray-200">
+                        <span class="font-bold text-gray-800">Price Excl. Taxes</span>
+                        <span id="yearly-price-excl-tax" class="font-bold"></span>
+                    </div>
+                    <div class="flex justify-between items-center py-1">
+                        <span class="text-gray-600">Taxes (18%)</span>
+                        <span id="yearly-tax" class="font-semibold"></span>
+                    </div>
+                    <div class="bg-gradient-to-r from-green-400 to-green-600 rounded-xl p-3">
+                        <div class="flex justify-between items-center text-white">
+                            <span class="font-bold">Total Annual Price (Incl. Taxes)</span>
+                            <span id="yearly-total-price" class="font-black text-xl sm:text-2xl"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Plan -->
+            <div class="glass-dark rounded-2xl p-5 md:p-6 hover-lift border-2 border-orange-200">
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h3 class="text-2xl sm:text-3xl font-black text-gray-800">📅 Monthly Plan</h3>
+                        <p class="text-base sm:text-lg font-semibold text-orange-600">Flexible • Pay as you go</p>
+                    </div>
+                    <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                        <span class="text-xl">📊</span>
+                    </div>
+                </div>
+                
+                <div class="space-y-3 text-base sm:text-lg">
+                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                        <span class="font-semibold text-gray-700">Base Price (Excl. Taxes)</span>
+                        <span id="monthly-base-price" class="font-bold"></span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                        <span class="font-semibold text-green-600" id="monthly-discount-label">Discount</span>
+                        <span id="monthly-discount" class="font-bold text-green-600"></span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b-2 border-gray-200">
+                        <span class="font-bold text-gray-800">Price Excl. Taxes</span>
+                        <span id="monthly-price-excl-tax" class="font-bold"></span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                        <span class="text-gray-600">Taxes (18%)</span>
+                        <span id="monthly-tax" class="font-semibold"></span>
+                    </div>
+                    <div class="bg-gradient-to-r from-orange-400 to-orange-600 rounded-xl p-3 mb-3">
+                        <div class="flex justify-between items-center text-white">
+                            <span class="font-bold">Monthly Total (Incl. Taxes)</span>
+                            <span id="monthly-total-price" class="font-black text-xl sm:text-2xl"></span>
+                        </div>
+                    </div>
+                    <div class="loss-highlight rounded-xl p-3">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold loss-text">Annualized Cost (12 months)</span>
+                            <span id="monthly-annualized-price" class="font-black text-xl sm:text-2xl loss-text"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Savings Highlight -->
+        <div class="savings-card rounded-2xl p-5 md:p-6 mb-6 text-white relative overflow-hidden" style="background: linear-gradient(135deg, #1f2937, #334155);">
+            <div class="relative z-10">
+                <div class="text-center mb-5">
+                    <h3 class="text-2xl sm:text-3xl font-black mb-2" style="color: white;">
+                        💸 Extra Cost with Monthly Plan
+                    </h3>
+                    <p class="text-base sm:text-xl font-medium" style="color: rgba(255,255,255,0.8);">See how much extra you pay by choosing monthly over yearly</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="text-center">
+                        <div class="bg-white/10 rounded-xl p-5 border border-white/20">
+                            <span id="total-loss-amount" class="block text-3xl sm:text-4xl lg:text-5xl font-black mb-2" style="color: var(--professional-highlight);"></span>
+                            <p class="text-base sm:text-xl font-semibold" style="color: rgba(255,255,255,0.8);">Additional Annual Cost</p>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-white/10 rounded-xl p-5 border border-white/20">
+                            <span id="loss-percentage" class="block text-3xl sm:text-4xl lg:text-5xl font-black mb-2" style="color: var(--professional-highlight);"></span>
+                            <p class="text-base sm:text-xl font-semibold" style="color: rgba(255,255,255,0.8);">% More Expensive</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-container rounded-2xl p-5 md:p-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-gray-800 mb-5 text-center">
+                📈 Annual Cost Comparison
+            </h3>
+            <div class="h-64">
+                <canvas id="cost-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Contact Footer -->
+    <footer class="contact-card rounded-2xl p-5 md:p-6 text-center">
+        <div class="mb-5">
+            <h3 class="text-2xl sm:text-3xl font-bold mb-2">🎯 Need Personalized Guidance?</h3>
+            <p class="text-base sm:text-xl text-gray-700">Connect with your dedicated Business Advisor</p>
+        </div>
+        
+        <div class="bg-white/10 rounded-xl p-5 max-w-sm mx-auto">
+            <div class="font-bold text-xl sm:text-2xl mb-3">Ataur Shah</div>
+            <div class="space-y-2 text-base sm:text-lg">
+                <a href="mailto:atsh@odoo.com" 
+                   class="flex items-center justify-center gap-2 bg-white/20 rounded-lg p-2 hover:bg-white/30 transition-all">
+                    <span class="text-lg">📧</span>
+                    <span class="font-semibold">atsh@odoo.com</span>
+                </a>
+                <a href="tel:+916357890606" 
+                   class="flex items-center justify-center gap-2 bg-white/20 rounded-lg p-2 hover:bg-white/30 transition-all">
+                    <span class="text-lg">📞</span>
+                    <span class="font-semibold">+91 6357890606</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- Comparison Modal -->
+<div id="compare-modal" class="modal">
+    <div class="modal-content p-4 md:p-6">
+        <span class="modal-close">&times;</span>
+        <h2 class="text-3xl sm:text-4xl font-black text-gray-800 text-center mb-6">
+            Standard Vs Custom Plan Comparison
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <!-- Standard Plan Details -->
+            <div class="bg-white rounded-xl p-4 md:p-5 shadow-lg border-2 border-purple-200">
+                <h3 class="text-xl sm:text-2xl font-bold text-purple-600 mb-3">✨ Standard Plan</h3>
+                <h4 class="text-lg sm:text-xl font-semibold text-gray-700 mb-2">Benefits:</h4>
+                <ul class="list-disc list-inside space-y-2 text-base sm:text-lg text-gray-600 mb-4">
+                    <li>Access to all apps</li>
+                    <li>Hosting: Odoo Online only</li>
+                </ul>
+                
+                <!-- First-Year Breakdown -->
+                <div class="bg-purple-50 rounded-lg p-2 md:p-3 mb-3 text-sm sm:text-base">
+                    <h5 class="font-bold text-lg sm:text-xl mb-2 text-purple-700">First-Year Pricing Breakdown</h5>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Base Price:</span>
+                        <span id="compare-standard-first-year-base-price" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Discount:</span>
+                        <span id="compare-standard-first-year-discount" class="font-semibold text-green-600"></span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Price after discount without tax:</span>
+                        <span id="compare-standard-first-year-price-excl-tax" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Taxes (18%):</span>
+                        <span id="compare-standard-first-year-tax" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center font-bold">
+                        <span>Total Price Incl. Taxes:</span>
+                        <span id="compare-standard-first-year-total-price" class="font-black"></span>
+                    </div>
+                </div>
+                
+                <!-- Renewal Breakdown -->
+                <div class="bg-purple-100 rounded-lg p-2 md:p-3 mb-3 text-sm sm:text-base">
+                    <h5 class="font-bold text-lg sm:text-xl mb-2 text-purple-700">Renewal Pricing Breakdown</h5>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Base Price:</span>
+                        <span id="compare-standard-renewal-base-price" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Discount:</span>
+                        <span id="compare-standard-renewal-discount" class="font-semibold text-green-600"></span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Taxes (18%):</span>
+                        <span id="compare-standard-renewal-tax" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center font-bold">
+                        <span>Total Price Incl. Taxes:</span>
+                        <span id="compare-standard-renewal-total-price" class="font-black"></span>
+                    </div>
+                </div>
+                
+                <div class="bg-purple-200 rounded-lg p-2 md:p-3 text-base sm:text-lg">
+                    <h5 class="font-bold text-purple-700 mb-2">Effective Costs (Excl. Taxes):</h5>
+                    <div class="flex justify-between items-center mb-2 text-sm sm:text-base">
+                        <span class="font-semibold text-gray-800">First Year / User / Month:</span>
+                        <span id="compare-standard-per-user-first-year" class="font-black"></span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm sm:text-base">
+                        <span class="font-semibold text-gray-800">Renewal / User / Month:</span>
+                        <span id="compare-standard-per-user-renewal" class="font-black"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Plan Details -->
+            <div class="bg-white rounded-xl p-4 md:p-5 shadow-lg border-2 border-purple-200">
+                <h3 class="text-xl sm:text-2xl font-bold text-purple-600 mb-3">🚀 Custom Plan</h3>
+                <h4 class="text-lg sm:text-xl font-semibold text-gray-700 mb-2">Benefits:</h4>
+                <ul class="list-disc list-inside space-y-2 text-base sm:text-lg text-gray-600 mb-4">
+                    <li>All apps</li>
+                    <li>Odoo Online / Odoo.sh / On-premise</li>
+                    <li>Odoo Studio</li>
+                    <li>Multi-Company</li>
+                    <li>External API</li>
+                </ul>
+
+                <!-- First-Year Breakdown -->
+                <div class="bg-purple-50 rounded-lg p-2 md:p-3 mb-3 text-sm sm:text-base">
+                    <h5 class="font-bold text-lg sm:text-xl mb-2 text-purple-700">First-Year Pricing Breakdown</h5>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Base Price:</span>
+                        <span id="compare-custom-first-year-base-price" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Discount:</span>
+                        <span id="compare-custom-first-year-discount" class="font-semibold text-green-600"></span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Price after discount without tax:</span>
+                        <span id="compare-custom-first-year-price-excl-tax" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Taxes (18%):</span>
+                        <span id="compare-custom-first-year-tax" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center font-bold">
+                        <span>Total Price Incl. Taxes:</span>
+                        <span id="compare-custom-first-year-total-price" class="font-black"></span>
+                    </div>
+                </div>
+                
+                <!-- Renewal Breakdown -->
+                <div class="bg-purple-100 rounded-lg p-2 md:p-3 mb-3 text-sm sm:text-base">
+                    <h5 class="font-bold text-lg sm:text-xl mb-2 text-purple-700">Renewal Pricing Breakdown</h5>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Base Price:</span>
+                        <span id="compare-custom-renewal-base-price" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Discount:</span>
+                        <span id="compare-custom-renewal-discount" class="font-semibold text-green-600"></span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1 text-xs sm:text-sm">
+                        <span>Taxes (18%):</span>
+                        <span id="compare-custom-renewal-tax" class="font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center font-bold">
+                        <span>Total Price Incl. Taxes:</span>
+                        <span id="compare-custom-renewal-total-price" class="font-black"></span>
+                    </div>
+                </div>
+
+                <div class="bg-purple-200 rounded-lg p-2 md:p-3 text-base sm:text-lg">
+                    <h5 class="font-bold text-purple-700 mb-2">Effective Costs (Excl. Taxes):</h5>
+                    <div class="flex justify-between items-center mb-2 text-sm sm:text-base">
+                        <span class="font-semibold text-gray-800">First Year / User / Month:</span>
+                        <span id="compare-custom-per-user-first-year" class="font-black"></span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm sm:text-base">
+                        <span class="font-semibold text-gray-800">Renewal / User / Month:</span>
+                        <span id="compare-custom-per-user-renewal" class="font-black"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col items-center mt-6">
+             <button id="copy-to-clipboard-btn" class="px-6 py-3 rounded-full font-bold text-white transition-all duration-300 hover:scale-105" style="background: linear-gradient(135deg, #06b6d4, #10b981);">
+                📋 Copy Pricing Breakdown
+            </button>
+            <span id="copy-message" class="text-green-600 font-semibold mt-2 hidden">Copied!</span>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+    // Pricing data structure
+    const pricingData = {
+        standard: {
+            yearly: { base: 8700, discount: -1740 },
+            monthly: { base: 950, discount: -190 }
+        },
+        custom: {
+            yearly: { base: 13800, discount: -3120 },
+            monthly: { base: 1420, discount: -280 }
+        }
+    };
+
+    // DOM elements
+    const numUsersInput = document.getElementById('num-users');
+    const inputError = document.getElementById('input-error');
+    const standardPlanBtn = document.getElementById('standard-plan-btn');
+    const customPlanBtn = document.getElementById('custom-plan-btn');
+    const planToggleBg = document.getElementById('plan-toggle-bg');
+    const yearToggleBtn = document.getElementById('year-toggle-btn');
+    const comparePlansBtn = document.getElementById('compare-plans-btn');
+    const compareModal = document.getElementById('compare-modal');
+    const modalCloseBtn = document.querySelector('.modal-close');
+    const copyBtn = document.getElementById('copy-to-clipboard-btn');
+    const copyMessage = document.getElementById('copy-message');
+    
+    // Display elements
+    const elements = {
+        yearlyDiscountLabel: document.getElementById('yearly-discount-label'),
+        yearlyBasePrice: document.getElementById('yearly-base-price'),
+        yearlyDiscount: document.getElementById('yearly-discount'),
+        yearlyPriceExclTax: document.getElementById('yearly-price-excl-tax'),
+        yearlyTax: document.getElementById('yearly-tax'),
+        yearlyTotalPrice: document.getElementById('yearly-total-price'),
+        
+        monthlyDiscountLabel: document.getElementById('monthly-discount-label'),
+        monthlyBasePrice: document.getElementById('monthly-base-price'),
+        monthlyDiscount: document.getElementById('monthly-discount'),
+        monthlyPriceExclTax: document.getElementById('monthly-price-excl-tax'),
+        monthlyTax: document.getElementById('monthly-tax'),
+        monthlyTotalPrice: document.getElementById('monthly-total-price'),
+        monthlyAnnualizedPrice: document.getElementById('monthly-annualized-price'),
+        
+        totalLossAmount: document.getElementById('total-loss-amount'),
+        lossPercentage: document.getElementById('loss-percentage')
+    };
+
+    // State
+    let isStandardPlan = true;
+    let isFirstYear = true;
+
+    // Chart setup with modern styling
+    const ctx = document.getElementById('cost-chart').getContext('2d');
+    let costChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['💎 Yearly Plan', '📅 Monthly Plan (12 months)'],
+            datasets: [{
+                label: 'Annual Cost (Rs.)',
+                data: [0, 0],
+                backgroundColor: [
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(239, 68, 68, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(16, 185, 129, 1)',
+                    'rgba(239, 68, 68, 1)'
+                ],
+                borderWidth: 3,
+                borderRadius: 12,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'white',
+                    bodyColor: 'white',
+                    cornerRadius: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.y;
+                            const isMonthly = context.dataIndex === 1;
+                            if (isMonthly) {
+                                return `Annual Cost: Rs. ${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (MORE EXPENSIVE!)`;
+                            } else {
+                                return `Annual Cost: Rs. ${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (BEST VALUE!)`;
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Annual Cost (Rs.)',
+                        font: { size: 14, weight: 'bold' }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)',
+                        borderDash: [5, 5]
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { size: 14, weight: 'bold' }
+                    }
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+
+    // Currency formatter
+    const formatCurrency = (value) => {
+        return `Rs. ${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
+
+    // Add smooth number animation
+    function animateNumber(element, targetValue, format = formatCurrency) {
+        const startValue = 0;
+        const duration = 800;
+        const increment = (targetValue - startValue) / (duration / 16);
+        let currentValue = startValue;
+        
+        const timer = setInterval(() => {
+            currentValue += increment;
+            if (currentValue >= targetValue) {
+                currentValue = targetValue;
+                clearInterval(timer);
+            }
+            element.textContent = format(currentValue);
+        }, 16);
+    }
+    
+    // Main calculation function
+    function updateCalculator() {
+        const numUsers = parseInt(numUsersInput.value, 10);
+        // Input validation: check for valid number of users
+        if (isNaN(numUsers) || numUsers < 1) {
+            inputError.textContent = 'Please enter a number greater than 0.';
+            return;
+        } else {
+            inputError.textContent = '';
+        }
+
+        const planKey = isStandardPlan ? 'standard' : 'custom';
+        const planRates = pricingData[planKey];
+        
+        let yearlyBase, yearlyDiscount, monthlyBase, monthlyDiscount;
+
+        if (isFirstYear) {
+            yearlyBase = planRates.yearly.base;
+            yearlyDiscount = planRates.yearly.discount;
+            monthlyBase = planRates.monthly.base;
+            monthlyDiscount = planRates.monthly.discount;
+            
+            elements.yearlyDiscountLabel.textContent = 'First-Year Discount (on initial order only)';
+            elements.monthlyDiscountLabel.textContent = 'First-Year Discount (on initial order only)';
+        } else {
+            yearlyBase = planRates.yearly.base;
+            yearlyDiscount = 0;
+            monthlyBase = planRates.monthly.base;
+            monthlyDiscount = 0;
+            
+            elements.yearlyDiscountLabel.textContent = 'Discount';
+            elements.monthlyDiscountLabel.textContent = 'Discount';
+        }
+
+        // Calculations
+        const yearlyPriceExclTax = (yearlyBase + yearlyDiscount) * numUsers;
+        const yearlyTax = yearlyPriceExclTax * 0.18;
+        const yearlyTotalPrice = yearlyPriceExclTax * 1.18;
+
+        const monthlyPriceExclTax = (monthlyBase + monthlyDiscount) * numUsers;
+        const monthlyTax = monthlyPriceExclTax * 0.18;
+        const monthlyTotalPrice = monthlyPriceExclTax * 1.18;
+
+        const monthlyAnnualizedCost = monthlyTotalPrice * 12;
+        const totalLoss = monthlyAnnualizedCost - yearlyTotalPrice;
+        const lossPercentage = (totalLoss / yearlyTotalPrice) * 100;
+
+        // Update UI with animations
+        animateNumber(elements.yearlyBasePrice, yearlyBase * numUsers);
+        if (isFirstYear && yearlyDiscount !== 0) {
+            const yearlyDiscountAmount = yearlyDiscount * numUsers;
+            const yearlyDiscountPercent = (Math.abs(yearlyDiscount) / yearlyBase) * 100;
+            elements.yearlyDiscount.textContent = `${formatCurrency(yearlyDiscountAmount)} (${yearlyDiscountPercent.toFixed(1)}%)`;
+        } else {
+            elements.yearlyDiscount.textContent = formatCurrency(yearlyDiscount * numUsers);
+        }
+        
+        animateNumber(elements.yearlyPriceExclTax, yearlyPriceExclTax);
+        animateNumber(elements.yearlyTax, yearlyTax);
+        animateNumber(elements.yearlyTotalPrice, yearlyTotalPrice);
+
+        animateNumber(elements.monthlyBasePrice, monthlyBase * numUsers);
+        if (isFirstYear && monthlyDiscount !== 0) {
+            const monthlyDiscountAmount = monthlyDiscount * numUsers;
+            const monthlyDiscountPercent = (Math.abs(monthlyDiscount) / monthlyBase) * 100;
+            elements.monthlyDiscount.textContent = `${formatCurrency(monthlyDiscountAmount)} (${monthlyDiscountPercent.toFixed(1)}%)`;
+        } else {
+            elements.monthlyDiscount.textContent = formatCurrency(monthlyDiscount * numUsers);
+        }
+        
+        animateNumber(elements.monthlyPriceExclTax, monthlyPriceExclTax);
+        animateNumber(elements.monthlyTax, monthlyTax);
+        animateNumber(elements.monthlyTotalPrice, monthlyTotalPrice);
+        animateNumber(elements.monthlyAnnualizedPrice, monthlyAnnualizedCost);
+
+        animateNumber(elements.totalLossAmount, totalLoss);
+        animateNumber(elements.lossPercentage, lossPercentage, (val) => `${val.toFixed(1)}%`);
+
+        // Update chart with animation
+        setTimeout(() => {
+            costChart.data.datasets[0].data = [yearlyTotalPrice, monthlyAnnualizedCost];
+            costChart.data.datasets[0].backgroundColor = [
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(239, 68, 68, 0.8)'
+            ];
+            costChart.data.datasets[0].borderColor = [
+                'rgba(16, 185, 129, 1)',
+                'rgba(239, 68, 68, 1)'
+            ];
+            costChart.update('active');
+        }, 200);
+    }
+    
+    // Function to update the comparison modal with current values
+    function updateComparisonModal() {
+        const numUsers = parseInt(numUsersInput.value, 10);
+        if (isNaN(numUsers) || numUsers < 1) {
+            return;
+        }
+        
+        // Standard Plan Calculations
+        const standardFirstYearBase = pricingData.standard.yearly.base * numUsers;
+        const standardFirstYearDiscount = pricingData.standard.yearly.discount * numUsers;
+        const standardFirstYearPriceExclTax = standardFirstYearBase + standardFirstYearDiscount;
+        const standardFirstYearTax = standardFirstYearPriceExclTax * 0.18;
+        const standardFirstYearTotalPrice = standardFirstYearPriceExclTax + standardFirstYearTax;
+        const standardFirstYearPerUserPerMonth = (standardFirstYearPriceExclTax / 12) / numUsers;
+        
+        const standardRenewalBase = pricingData.standard.yearly.base * numUsers;
+        const standardRenewalPriceExclTax = standardRenewalBase;
+        const standardRenewalTax = standardRenewalPriceExclTax * 0.18;
+        const standardRenewalTotalPrice = standardRenewalPriceExclTax + standardRenewalTax;
+        const standardRenewalPerUserPerMonth = (standardRenewalPriceExclTax / 12) / numUsers;
+
+        // Custom Plan Calculations
+        const customFirstYearBase = pricingData.custom.yearly.base * numUsers;
+        const customFirstYearDiscount = pricingData.custom.yearly.discount * numUsers;
+        const customFirstYearPriceExclTax = customFirstYearBase + customFirstYearDiscount;
+        const customFirstYearTax = customFirstYearPriceExclTax * 0.18;
+        const customFirstYearTotalPrice = customFirstYearPriceExclTax + customFirstYearTax;
+        const customFirstYearPerUserPerMonth = (customFirstYearPriceExclTax / 12) / numUsers;
+        
+        const customRenewalBase = pricingData.custom.yearly.base * numUsers;
+        const customRenewalPriceExclTax = customRenewalBase;
+        const customRenewalTax = customRenewalPriceExclTax * 0.18;
+        const customRenewalTotalPrice = customRenewalPriceExclTax + customRenewalTax;
+        const customRenewalPerUserPerMonth = (customRenewalPriceExclTax / 12) / numUsers;
+        
+        // Update Modal UI
+        // Standard First Year
+        const standardFirstYearDiscountPercent = (Math.abs(pricingData.standard.yearly.discount) / pricingData.standard.yearly.base) * 100;
+        document.getElementById('compare-standard-first-year-base-price').textContent = formatCurrency(standardFirstYearBase);
+        document.getElementById('compare-standard-first-year-discount').textContent = `${formatCurrency(standardFirstYearDiscount)} (${standardFirstYearDiscountPercent.toFixed(1)}%)`;
+        document.getElementById('compare-standard-first-year-price-excl-tax').textContent = formatCurrency(standardFirstYearPriceExclTax);
+        document.getElementById('compare-standard-first-year-tax').textContent = formatCurrency(standardFirstYearTax);
+        document.getElementById('compare-standard-first-year-total-price').textContent = formatCurrency(standardFirstYearTotalPrice);
+
+        // Standard Renewal
+        document.getElementById('compare-standard-renewal-base-price').textContent = formatCurrency(standardRenewalBase);
+        document.getElementById('compare-standard-renewal-discount').textContent = formatCurrency(0) + ' (0.0%)';
+        document.getElementById('compare-standard-renewal-tax').textContent = formatCurrency(standardRenewalTax);
+        document.getElementById('compare-standard-renewal-total-price').textContent = formatCurrency(standardRenewalTotalPrice);
+        document.getElementById('compare-standard-per-user-first-year').textContent = formatCurrency(standardFirstYearPerUserPerMonth);
+        document.getElementById('compare-standard-per-user-renewal').textContent = formatCurrency(standardRenewalPerUserPerMonth);
+        
+        // Custom First Year
+        const customFirstYearDiscountPercent = (Math.abs(pricingData.custom.yearly.discount) / pricingData.custom.yearly.base) * 100;
+        document.getElementById('compare-custom-first-year-base-price').textContent = formatCurrency(customFirstYearBase);
+        document.getElementById('compare-custom-first-year-discount').textContent = `${formatCurrency(customFirstYearDiscount)} (${customFirstYearDiscountPercent.toFixed(1)}%)`;
+        document.getElementById('compare-custom-first-year-price-excl-tax').textContent = formatCurrency(customFirstYearPriceExclTax);
+        document.getElementById('compare-custom-first-year-tax').textContent = formatCurrency(customFirstYearTax);
+        document.getElementById('compare-custom-first-year-total-price').textContent = formatCurrency(customFirstYearTotalPrice);
+
+        // Custom Renewal
+        document.getElementById('compare-custom-renewal-base-price').textContent = formatCurrency(customRenewalBase);
+        document.getElementById('compare-custom-renewal-discount').textContent = formatCurrency(0) + ' (0.0%)';
+        document.getElementById('compare-custom-renewal-tax').textContent = formatCurrency(customRenewalTax);
+        document.getElementById('compare-custom-renewal-total-price').textContent = formatCurrency(customRenewalTotalPrice);
+        document.getElementById('compare-custom-per-user-first-year').textContent = formatCurrency(customFirstYearPerUserPerMonth);
+        document.getElementById('compare-custom-per-user-renewal').textContent = formatCurrency(customRenewalPerUserPerMonth);
+    }
+    
+    // Function to generate and copy the pricing summary to the clipboard
+    function copyPricingSummary() {
+        const numUsers = parseInt(numUsersInput.value, 10);
+        const standardPlanRates = pricingData.standard.yearly;
+        const customPlanRates = pricingData.custom.yearly;
+        
+        const standardFirstYearPrice = (standardPlanRates.base + standardPlanRates.discount) * numUsers * 1.18;
+        const standardRenewalPrice = standardPlanRates.base * numUsers * 1.18;
+        const customFirstYearPrice = (customPlanRates.base + customPlanRates.discount) * numUsers * 1.18;
+        const customRenewalPrice = customPlanRates.base * numUsers * 1.18;
+        
+        const summary = `Odoo Pricing Breakdown for ${numUsers} Users:\n\n` +
+                        `Standard Plan:\n` +
+                        `  First Year: ${formatCurrency(standardFirstYearPrice)}\n` +
+                        `  Renewal: ${formatCurrency(standardRenewalPrice)}\n\n` +
+                        `Custom Plan:\n` +
+                        `  First Year: ${formatCurrency(customFirstYearPrice)}\n` +
+                        `  Renewal: ${formatCurrency(customRenewalPrice)}`;
+                        
+        // Use an old-school method for broader compatibility in some environments
+        const tempTextArea = document.createElement('textarea');
+        tempTextArea.value = summary;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempTextArea);
+        
+        // Show confirmation message
+        copyMessage.classList.remove('hidden');
+        setTimeout(() => {
+            copyMessage.classList.add('hidden');
+        }, 2000);
+    }
+
+    // Event listeners
+    numUsersInput.addEventListener('input', () => {
+        updateCalculator();
+        updateComparisonModal();
+    });
+
+    standardPlanBtn.addEventListener('click', () => {
+        if (!isStandardPlan) {
+            isStandardPlan = true;
+            updatePlanButtons();
+            updateCalculator();
+        }
+    });
+
+    customPlanBtn.addEventListener('click', () => {
+        if (isStandardPlan) {
+            isStandardPlan = false;
+            updatePlanButtons();
+            updateCalculator();
+        }
+    });
+
+    function updatePlanButtons() {
+        if (isStandardPlan) {
+            standardPlanBtn.classList.add('active');
+            standardPlanBtn.classList.remove('inactive');
+            customPlanBtn.classList.add('inactive');
+            customPlanBtn.classList.remove('active');
+            planToggleBg.classList.remove('right');
+        } else {
+            customPlanBtn.classList.add('active');
+            customPlanBtn.classList.remove('inactive');
+            standardPlanBtn.classList.add('inactive');
+            standardPlanBtn.classList.remove('active');
+            planToggleBg.classList.add('right');
+        }
+    }
+
+    yearToggleBtn.addEventListener('click', () => {
+        isFirstYear = !isFirstYear;
+        yearToggleBtn.textContent = isFirstYear ? '🔄 Show Renewal Pricing' : '🔄 Show First-Year Pricing';
+        
+        // Add button animation
+        yearToggleBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            yearToggleBtn.style.transform = 'scale(1)';
+        }, 150);
+        
+        updateCalculator();
+        // Update comparison modal if it's open
+        if (compareModal.style.display === 'block') {
+             updateComparisonModal();
+        }
+    });
+    
+    comparePlansBtn.addEventListener('click', () => {
+        compareModal.style.display = 'block';
+        updateComparisonModal();
+    });
+    
+    modalCloseBtn.addEventListener('click', () => {
+        compareModal.style.display = 'none';
+    });
+    
+    window.addEventListener('click', (event) => {
+        if (event.target === compareModal) {
+            compareModal.style.display = 'none';
+        }
+    });
+    
+    // Copy to clipboard event listener
+    copyBtn.addEventListener('click', copyPricingSummary);
+
+    // Initialize
+    window.addEventListener('load', () => {
+        updatePlanButtons();
+        setTimeout(updateCalculator, 300);
+        updateComparisonModal();
+    });
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Implementation Service Cost Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --main-color: #a48b59; /* Goldish Color */
+            --text-color: #333;
+            --shadow-light: #ffffff;
+            --shadow-dark: #d1d9e6;
+            --border-radius-lg: 31.25px;
+            --border-radius-md: 18.75px;
+            --spacing-lg: 2.5rem;
+            --spacing-md: 1.25rem;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: var(--spacing-lg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .calculator-container {
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            width: 100%;
+            max-width: 500px; /* Increased by 25% */
+            box-shadow: 
+                12px 12px 25px var(--shadow-dark),
+                -12px -12px 25px var(--shadow-light);
+            display: flex;
+            flex-direction: column;
+            gap: 1.875rem; /* Increased by 25% */
+        }
+
+        h1 {
+            font-size: 1.875rem; /* Increased by 25% */
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-color);
+            letter-spacing: 1px;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .display {
+            background-color: #e0e5ec;
+            border-radius: var(--border-radius-md);
+            padding: 1.875rem; /* Increased by 25% */
+            text-align: right;
+            font-size: 1.875rem; /* Increased by 25% */
+            font-weight: 700;
+            color: var(--main-color);
+            box-shadow: 
+                inset 2.5px 2.5px 6.25px var(--shadow-dark),
+                inset -2.5px -2.5px 6.25px var(--shadow-light);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem; /* Increased by 25% */
+        }
+        
+        .input-group, .result-card {
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius-md);
+            padding: 1.25rem; /* Increased by 25% */
+            box-shadow: 
+                4px 4px 8px var(--shadow-dark),
+                -4px -4px 8px var(--shadow-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .input-group:hover, .result-card:hover {
+            box-shadow: 
+                inset 2.5px 2.5px 6.25px var(--shadow-dark),
+                inset -2.5px -2.5px 6.25px var(--shadow-light);
+            transform: scale(0.98);
+        }
+
+        /* Styles for the 3D bubble cards */
+        .bubble-card {
+            box-shadow: 
+                8px 8px 16px rgba(0, 0, 0, 0.2),
+                -8px -8px 16px rgba(255, 255, 255, 0.5),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.5),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.2);
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .bubble-card:hover {
+            transform: scale(1.05);
+        }
+        
+        #targetAmountInputCard {
+            background: linear-gradient(145deg, #e4d1f4, #c8a9c7); /* Light purple gradient */
+            color: #5c115c; /* Dark purple text */
+        }
+        
+        #targetAmountInputCard:hover {
+            background: linear-gradient(145deg, #f0f2f5, #d1d9e6);
+            color: var(--main-color);
+        }
+
+        #requiredAmountCard {
+            background: linear-gradient(145deg, #fcdada, #e6c5c5); /* Light red gradient */
+            color: #8c0000; /* Dark red text */
+        }
+        
+        #requiredAmountCard:hover {
+            background: linear-gradient(145deg, #f0f2f5, #d1d9e6);
+            color: var(--main-color);
+        }
+
+        #percentageAchievedCard {
+            background: linear-gradient(145deg, #d1f4d1, #a9c7a9); /* Light green gradient */
+            color: #115c11; /* Dark green text */
+        }
+
+        #percentageAchievedCard:hover {
+            background: linear-gradient(145deg, #f0f2f5, #d1d9e6);
+            color: var(--main-color);
+        }
+        
+        label {
+            font-weight: 600;
+            font-size: 1rem; /* Increased by 25% */
+            text-align: center;
+            margin-bottom: 0.625rem; /* Increased by 25% */
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            background-color: var(--bg-color);
+            border: none;
+            border-radius: 10px; /* Increased by 25% */
+            padding: 0.75rem; /* Increased by 25% */
+            font-size: 1.125rem; /* Increased by 25% */
+            color: var(--text-color);
+            box-shadow: 
+                inset 2.5px 2.5px 6.25px var(--shadow-dark),
+                inset -2.5px -2.5px 6.25px var(--shadow-light);
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23333'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.625rem center; /* Increased by 25% */
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            box-shadow: 
+                inset 1.25px 1.25px 3.75px var(--shadow-dark),
+                inset -1.25px -1.25px 3.75px var(--shadow-light),
+                0 0 6.25px var(--main-color);
+        }
+        
+        /* Remove the entry bar from the target amount input */
+        #targetAmountInputCard input[type="number"] {
+            background-color: transparent;
+            box-shadow: none;
+            font-weight: 700;
+            color: #5c115c;
+            font-size: 1.5rem;
+            padding: 0;
+        }
+        
+        .result-card .label {
+            font-size: 1rem; /* Increased by 25% */
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.3125rem; /* Increased by 25% */
+        }
+
+        .result-card .value {
+            font-size: 1.5rem; /* Increased by 25% */
+            font-weight: 700;
+            color: var(--main-color);
+            transition: color 0.3s ease;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem; /* Increased by 25% */
+            margin-top: 1.25rem; /* Increased by 25% */
+        }
+
+        .button-group button {
+            background-color: var(--bg-color);
+            border: none;
+            border-radius: 15px; /* Increased by 25% */
+            padding: 1.25rem; /* Increased by 25% */
+            font-size: 1.125rem; /* Increased by 25% */
+            color: var(--text-color);
+            box-shadow: 
+                4px 4px 8px var(--shadow-dark),
+                -4px -4px 8px var(--shadow-light);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .button-group button:hover {
+            color: var(--main-color);
+            box-shadow: 
+                inset 2.5px 2.5px 6.25px var(--shadow-dark),
+                inset -2.5px -2.5px 6.25px var(--shadow-light);
+            transform: scale(0.98);
+        }
+
+        .button-group button.active {
+             box-shadow: 
+                inset 2.5px 2.5px 6.25px var(--shadow-dark),
+                inset -2.5px -2.5px 6.25px var(--shadow-light);
+            color: var(--main-color);
+        }
+
+        /* --- Print Styles --- */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+                margin: 0;
+            }
+            body > *:not(#report-print-area) {
+                display: none;
+            }
+            
+            #report-print-area {
+                display: block;
+                width: 210mm; /* A4 width */
+                min-height: 297mm; /* A4 height */
+                margin: 0 auto;
+                padding: 25mm; /* Standard A4 margins */
+                box-sizing: border-box;
+                color: #000;
+                font-family: 'Inter', sans-serif;
+                font-size: 12pt;
+            }
+            
+            .report-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid #ddd;
+                margin-bottom: 2rem;
+            }
+
+            .report-header img {
+                height: 40px;
+                width: auto;
+            }
+            
+            .report-header h2 {
+                margin: 0;
+                font-size: 20pt;
+                color: #017e84;
+            }
+
+            .report-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 1.5rem;
+            }
+            
+            .report-table th, .report-table td {
+                border: 1px solid #ccc;
+                padding: 0.75rem;
+                text-align: left;
+            }
+            
+            .report-table th {
+                background-color: #f2f2f2;
+                font-weight: 600;
+            }
+            
+            .report-section {
+                margin-bottom: 1.5rem;
+            }
+
+            .report-section strong {
+                font-weight: 700;
+            }
+
+            .report-footer {
+                margin-top: 2rem;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <h1>Odoo Implementation Service Cost Calculator</h1>
+        <div class="display" id="mainDisplay">
+            <span id="displayValue">0.00</span>
+        </div>
+
+        <div class="controls-grid">
+            <div class="input-group">
+                <label for="hours">Success Pack (Hours)</label>
+                <select id="hours">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="75">75</option>
+                    <option value="100" selected>100</option>
+                    <option value="125">125</option>
+                    <option value="150">150</option>
+                    <option value="175">175</option>
+                    <option value="200">200</option>
+                    <option value="225">225</option>
+                    <option value="250">250</option>
+                    <option value="275">275</option>
+                    <option value="300">300</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="discount">Discount (%)</label>
+                <input type="number" id="discount" value="30" min="0" max="100">
+            </div>
+            <div class="result-card" id="standardRateCard">
+                <span class="label">Standard Rate</span>
+                <span class="value" id="standardRate">₹0.00</span>
+            </div>
+            <div class="result-card" id="afterDiscountPriceCard">
+                <span class="label" id="afterDiscountLabel">After Discount (30%)</span>
+                <span class="value" id="afterDiscountPrice">₹0.00</span>
+            </div>
+            <div class="result-card" id="totalSavingCard">
+                <span class="label">Total Saving</span>
+                <span class="value" id="totalSaving">₹0.00</span>
+            </div>
+            <div class="result-card" id="gstAmountCard">
+                <span class="label">GST (18%)</span>
+                <span class="value" id="gstAmount">₹0.00</span>
+            </div>
+            <div class="result-card" id="finalPriceCard">
+                <span class="label">Final Price</span>
+                <span class="value" id="finalPrice">₹0.00</span>
+            </div>
+            <div class="result-card" id="perHourAfterDiscountCard">
+                <span class="label">Per Hour Rate</span>
+                <span class="value" id="perHourAfterDiscount">₹0.00</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="active" onclick="setCurrency('INR')">INR</button>
+            <button onclick="setCurrency('USD')">USD</button>
+            <button onclick="generateReport()">Print Report</button>
+        </div>
+
+        <div class="controls-grid">
+            <div class="input-group bubble-card" id="targetAmountInputCard">
+                <label for="targetAmount">Target Amount (USD)</label>
+                <input type="number" id="targetAmount" value="0" min="0">
+            </div>
+            <div class="result-card bubble-card" id="requiredAmountCard">
+                <span class="label">Amount to Reach Target</span>
+                <span class="value" id="requiredAmount">$0.00</span>
+            </div>
+            <div class="result-card bubble-card" id="percentageAchievedCard">
+                <span class="label">Target Achieved</span>
+                <span class="value" id="percentageAchieved">0.00%</span>
+            </div>
+        </div>
+    </div>
+    
+    <div id="report-print-area"></div>
+
+    <script>
+        const RATES_INR = {
+            25: 95570,
+            50: 186153,
+            75: 281722,
+            100: 332416,
+            125: 427986,
+            150: 518569,
+            175: 614139,
+            200: 694831,
+            225: 760401,
+            250: 850994,
+            275: 946554,
+            300: 997247
+        };
+
+        const USD_INR_RATE = 80;
+
+        let currentCurrency = 'INR';
+
+        const hoursInput = document.getElementById('hours');
+        const discountInput = document.getElementById('discount');
+        const targetAmountInput = document.getElementById('targetAmount');
+        const standardRateSpan = document.getElementById('standardRate');
+        const afterDiscountLabel = document.getElementById('afterDiscountLabel');
+        const afterDiscountPriceSpan = document.getElementById('afterDiscountPrice');
+        const totalSavingSpan = document.getElementById('totalSaving');
+        const gstAmountSpan = document.getElementById('gstAmount');
+        const finalPriceSpan = document.getElementById('finalPrice');
+        const perHourAfterDiscountSpan = document.getElementById('perHourAfterDiscount');
+        const displayValueSpan = document.getElementById('displayValue');
+        const requiredAmountSpan = document.getElementById('requiredAmount');
+        const percentageAchievedSpan = document.getElementById('percentageAchieved');
+        const resultCards = document.querySelectorAll('.result-card');
+
+        function animateValue(obj, start, end, duration, currency, isPercentage = false) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const currentValue = start + progress * (end - start);
+                
+                if (isPercentage) {
+                    obj.textContent = `${currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+                } else {
+                    const formatter = currency === 'INR' ? 'en-IN' : 'en-US';
+                    const symbol = currency === 'INR' ? '₹' : '$';
+                    obj.textContent = `${symbol}${currentValue.toLocaleString(formatter, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                }
+
+                if (obj === finalPriceSpan) {
+                    displayValueSpan.textContent = finalPriceSpan.textContent;
+                }
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+        
+        function calculateAndDraw() {
+            let hours = parseFloat(hoursInput.value) || 0;
+            let discountPercentage = parseFloat(discountInput.value) || 0;
+            let targetAmountUSD = parseFloat(targetAmountInput.value) || 0;
+
+            const standardRateINR = RATES_INR[hours];
+            const afterDiscountPriceINR = standardRateINR * (1 - discountPercentage / 100);
+            const totalSavingINR = standardRateINR - afterDiscountPriceINR;
+            const gstAmountINR = afterDiscountPriceINR * 0.18;
+            const finalPriceINR = afterDiscountPriceINR + gstAmountINR;
+            const perHourAfterDiscountINR = afterDiscountPriceINR / hours;
+
+            const afterDiscountPriceUSD = afterDiscountPriceINR / USD_INR_RATE;
+            const requiredAmountUSD = targetAmountUSD - afterDiscountPriceUSD;
+            const percentageAchieved = (afterDiscountPriceUSD / targetAmountUSD) * 100 || 0;
+
+            let rateMultiplier = 1;
+            if (currentCurrency === 'USD') {
+                rateMultiplier = 1 / USD_INR_RATE;
+            }
+
+            const oldStandardRate = parseFloat(standardRateSpan.textContent.replace(/[^0-9.]/g, '')) || 0;
+            const oldAfterDiscountPrice = parseFloat(afterDiscountPriceSpan.textContent.replace(/[^0-9.]/g, '')) || 0;
+            const oldTotalSaving = parseFloat(totalSavingSpan.textContent.replace(/[^0-9.]/g, '')) || 0;
+            const oldGstAmount = parseFloat(gstAmountSpan.textContent.replace(/[^0-9.]/g, '')) || 0;
+            const oldFinalPrice = parseFloat(finalPriceSpan.textContent.replace(/[^0-9.]/g, '')) || 0;
+            const oldPerHourAfterDiscount = parseFloat(perHourAfterDiscountSpan.textContent.replace(/[^0-9.]/g, '')) || 0;
+            const oldRequiredAmount = parseFloat(requiredAmountSpan.textContent.replace(/[^0-9.]/g, '')) || 0;
+            const oldPercentageAchieved = parseFloat(percentageAchievedSpan.textContent.replace(/[^0-9.]/g, '')) || 0;
+
+            afterDiscountLabel.textContent = `After Discount (${discountPercentage}%)`;
+
+            // Animate all values
+            animateValue(standardRateSpan, oldStandardRate, standardRateINR * rateMultiplier, 500, currentCurrency);
+            animateValue(afterDiscountPriceSpan, oldAfterDiscountPrice, afterDiscountPriceINR * rateMultiplier, 500, currentCurrency);
+            animateValue(totalSavingSpan, oldTotalSaving, totalSavingINR * rateMultiplier, 500, currentCurrency);
+            animateValue(gstAmountSpan, oldGstAmount, gstAmountINR * rateMultiplier, 500, currentCurrency);
+            animateValue(finalPriceSpan, oldFinalPrice, finalPriceINR * rateMultiplier, 500, currentCurrency);
+            animateValue(perHourAfterDiscountSpan, oldPerHourAfterDiscount, perHourAfterDiscountINR * rateMultiplier, 500, currentCurrency);
+            animateValue(requiredAmountSpan, oldRequiredAmount, requiredAmountUSD, 500, 'USD');
+            animateValue(percentageAchievedSpan, oldPercentageAchieved, percentageAchieved, 500, null, true);
+        }
+
+        function setCurrency(currency) {
+            currentCurrency = currency;
+            document.querySelectorAll('.button-group button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.button-group button[onclick="setCurrency('${currency}')"]`).classList.add('active');
+            calculateAndDraw();
+        }
+
+        function generateReport() {
+            const printArea = document.getElementById('report-print-area');
+            const hours = hoursInput.value;
+            const discount = discountInput.value;
+            const currency = currentCurrency;
+
+            const standardRate = standardRateSpan.textContent;
+            const afterDiscountPrice = afterDiscountPriceSpan.textContent;
+            const totalSaving = totalSavingSpan.textContent;
+            const gstAmount = gstAmountSpan.textContent;
+            const finalPrice = finalPriceSpan.textContent;
+            const perHourAfterDiscount = perHourAfterDiscountSpan.textContent;
+            
+            const reportContent = `
+                <div class="report-header">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MCA1MCI+PHBhdGggZmlsbD0iIzc3NzY3MiIgZD0iTTUwLDI1YzAsMTMuNzgtMTEuMjIsMjUtMjUsMjVTMCwzNi4yMiwwLDI1UzExLjIyLDAsMjUsMFMzNi43OCwwLDM2Ljc4LDhMMjUsMEMxMS4yMiwwLDAsMTEuMjIsMCwyNXMxMS4yMiwyNSwyNSwyNSwyNS0xMS4yMiw2LjctMTkuNjZsNS4xNy01LjE3QzQ4LjYyLDE0LjQxLDUwLDE5Ljk4LDUwLDI1eiIgLz48cGF0aCBmaWxsPSIjNzZmNzA0IiBkPSJNMzYuNzgsOUMzNi43OCw1LjExLDM0LDIuODgsMjkuMTcsNC40M2wtNi45LDYuOUwyNSw1MGMxMy43OCwwLDI1LTExLjIyLDI1LTI1YzAtMi4yMi0uMzEtNC4zNi0uODMtNi40M0wzNi43OCw4Ljk4eiIgLz48cGF0aCBmaWxsPSIjMDEwMTBhIiBkPSJNMzAuNSwxMi40NWMtMy4wMy0uOTYtNi42NS0xLjIxLTEwLjM4LTEuMTFjLTIuOTEuMDgtNC41OS42Mi01LjIxLjk3bC0uMjctLjI3Yy0uOTgtLjk4LTEuOTYtMS45Ni0yLjI3LTEuOTZjLS4zMSwwLS42NS4wNi0uNzcuMTVsLS4yNS0uMjVDMTAsOS45NSw5LjU5LDkuMzUsOS41OSw4Ljg4QzkuNTksOC4yLDguOTksNy44LDguNDMsNy40NmMtLjM1LS4xOC0uNTEtLjI2LS42OC0uMjlDNy4zMyw2LjgxLDYuNzksNi40Miw1Ljg4LDYuMTFDLjIyLDIuMDgsMCwxMC45NCwwLDE5Ljk4YzYuMTktLjYyLDguOTQtMS4zMyw5LjQxLTEuNjlDNy41LDEwLjYsNy42NSwxMC43MSw3LjY1LDEwLjc5YzAsLjI4LS4yNy41Ny0uOTEuOTktMS4yMS44LTMuMjksMi4xNS00LjI5LDMuMjktMS40LDEuNTMtMi4xLDIuMzgtMi4xLDIuNzlzLjczLjg1LDEuNzksMS42OWMwLS4wMS0xLjEzLDEuMS0xLjczLDIuNDVjLTEuMjcsMy4yOC0yLjQxLDUuNDEtMy42OCw2LjkxLTMuODksNC43Mi02LjM1LDguMjQtNy41OSwxMC43MUMtLjI2LDM2LjA0LDAsMzguNTYsMCwzOC41NmMzLjk5LDkuMTYsOC45MSwxNC4yNywxNC45MywxNy43OWMtLjIyLjE1LS40NC4zLS43LjQyLS42NC4zNi0uOTUuNTItMS42MS44NmMtLjguNDItMS4zMy43MS0xLjYxLjg2Yy0uNDEuMTUtLjczLjI2LS45My40M2MtLjMuMjUtLjYzLjU0LTEuMjQuNzVjLS42LjIxLTEuNDcuNDQtMi40OS43M2MtLjEyLjAyLS4zMi4wNy0uNTIuMTEtLjI2LjA3LS41My4xNC0uNzkuMjEtLjA5LjAyLS4xOS4wMy0uMjguMDVDMy4xLDQ3LjQ2LDIuNCw0Ny42MywxLjY1LDQ3LjkxYy0uODUuMy0xLjU1LjYxLTIuMTgsLjk1bC0uMS0uMzJjMC0yLjYxLDAtNS41MywwLTguNDJjMS4wMi00LjI2LDIuMTQtNy42NCwzLjktMTEuMzljMS40NS0zLjA4LDIuOTctNC43MSw0LjQxLTYuMDZsLTIuNDMtNS40Yy0xLjM5LTEuMTYtMS42MS0xLjY3LTEuNjEtMi41OCAwLS4yOC4yMi0uNDcuNTUtLjZjLjc3LS40LDMuMjQtMS43OSw1LjA2LTMuMTgsMy45Mi0yLjk0LDYuMjYtNS4wNiw3LjE0LTYuMjljMS4xMy0xLjUzLDEuODktMi4zNCwyLjMxLTIuMzdzMS44NCwxLjUxLDMuOCwzLjQ4Yy0uNjYtLjUtMS4yNy0uOTktMS43NC0xLjM4Yy0yLjA1LTEuNzUtNC40NC0zLjA1LTYuNzctMy43Ni0yLjc0LS43Ny00LjY0LS43NC01LjY5LS40Yy0uMjguMDktLjUyLjI1LS43LjQxYy0uMzIuMzEtLjQ1LjQ2LS40NS40NmMtLjM1LjM2LS44MS42Ny0xLjEyLjI3Yy0uNDQuMjctLjY3LjQtLjg2LjUzYy0uMjguMTgtLjQ0LjI0LS41NC4yNy0uMTUuMDUtLjMzLjEyLS41NS4yYy0uMjIuMDctLjQ1LjEyLS42Ni4xNy0uNDYuMTItLjY3LjE0LS44LjE0LS4xMiwwLS42MS0uMDItMS4zMi0uMTljLS42Ni0uMTYtMS4zMy0uMzUtMS45OS0uNTRsLS41LS4xNy0uNDYuNDZzLTEuMTgsMS41NS0xLjI1LDIuNzEtLjU4LDYuOTQtMS41MSwxMS42Yy0uNzIsMy41OS0xLjQ0LDUuNDUtMi4zNSw4LjE5cy0xLjk1LDUuMTktMy4yMyw3LjEyYy0xLjk1LDMuMTctMy4xNyw1LjY3LTMuNjYsNi44NWMtLjI0LjU2LS42LDEuMDktMS4xMywxLjYxYy0uNjMuNTctMS4zNCwxLjMtMS44OSwyLjFjLS44OSwxLjM0LTEuNTgsMi4yOC0xLjczLDIuNzdjLS4xLjMtLjEuMzUtLjEuMzVzLTExLjUtNS41Mi0xNi41NS0xMi40NWMtLjc1LTYuNDItLjc3LTEzLjE2LDAtMTkuNjdjLjE3LTEuNDMsLjQzLTIuNzYsLjctNC4wNWMuMjctMS4yOS42OC0yLjQ0LDEuMTktMy41My40My0uODksLjkyLTEuNzcsMS41LTEuOTNsLS4zLjI5Yy0uMTcuMTUtLjMyLjI5LS40OC40M2MtLjI2LjIzLS41LjQ2LS43MS42OC0xLjU1LDEuNzYtMy4zNCwzLjM2LTQuOTgsNC43NWMtMS45MywxLjY5LTMuNzMsMi45Mi01LjQ1LDMuOTRjLS44My40OS0xLjU4LDEuMTMtMS45NiwxLjc1bC0uNzYtMS43Yy40Ni0uODUsMS4wMi0xLjcyLDEuNjQtMi41NWMxLjQxLTEuODksMy4xMy0zLjQ0LDUuMDItNC43Mkw0LjU0LDEzLjU1Yy0uODEtMS4wNC0xLjM3LTIuMDYtMS42NS0zLjE1Yy0uMzktMS41LS43MS0zLjk5LS43MS02Ljk5VjEuMTNDMi4xLDYuMjMsMi40Nyw3LjYsMy4yMyw4LjcxYy42Ni45LDEuNTQsMS41MiwyLjU4LDEuODFjLjIuMDYsLjUuMTIsLjg1LjE5YzEuMjkuMjYsMi42MS4xMSwzLjczLS40OWwxLjQyLS42OS4xNS0uMzQtLjcxLS44N2MtLjEzLS4xNi0uMjYtLjMyLS4zOS0uNDZsLTIuMDgtMi4xMUM0LjgyLDMuMDksMi40NS0uODIsMC0xLjExYzAtLjU3LS4wMi43Ni0uMDYtLjk2Yy0uODItMS4xMS0xLjMxLTEuNzMtMS42NC0xLjk2TDAuMzcsMC4zNmwtLjA0LjQ1VjEzLjJjMS4wMy01LjI1LDEuODEtNy41NCwyLjU0LTguOTJsLS4wNC4zNWMtLjE4LjE1LS4zNC4zMS0uNTMuNDdjLS42My41Mi0xLjI0LDEuMDgtMS44NywxLjYzLS42MS41My0xLjE5LDEuMDgtMS43NywxLjY1Yy0uNDYuNDUtLjkxLjg2LTEuMzUsMS4yN2wxLjQxLTEuNDVjLjEzLS4xNi4yNi4uMzEuMzgtLjQ3LS40Mi0uMzktLjgxLS43OS0xLjE4LTEuMTlsLS4wNS4wNmMtLjM1LjM1LS43LjctMS4wNCwxLjA0Yy0xLjMxLDEuMzEtMi42MiwyLjY1LTMuODIsMy45OS0yLjAxLDIuMjUtMy42Myw0LjU2LTQuNzMsNi45MkwuODMsMzEuNTRjLjA2LjEyLjE1LjI5LjI5LjQ1LjI5LjM3LjY1Ljc4LDEuMTEsMS4xOWMtLjA5LjExLS4xOS4yMy0uMjkuMzRjLTEuNzEsMS43Ni0yLjczLDQuNzctMi44OSw2LjkwOS0uMTQsMS44Ny0uMDgsMy44NC4xNiw1LjY2OS43Miw0Ljc5LDIuMDYsNy4yMywzLjY1LDguNDU0LDEuMDcuODIsMi4yLDIuMiwyLjgxNCwyLjU2NWMuODIsLjMsMS43Ni41OCwyLjgyLjgwOS4zMy4wOC42OS4xNCwxLjA4LjE4YzEuODQuMTgsMy43Mi0uMTIsNS41NS0uODQxLDEuNjItLjY0LDMuMDktMS4yMyw0LjI4LTEuNzM5LjQ5LS4yMS45Ny0uNCwxLjQ1LS42MS44Ni0uMzUsMS45Mi0uNzQsMy4yMy0xLjIzbDcuNDQtMy4wM2M0LjA3LTEuNjcsNy4xNi0zLjQ4LDguNTQtNC42N2wxLjI4LS42OWMtMS45NC0uNDItMy42Mi0uOTYtNS4wNi0xLjczQzMyLjQsNDguMTQsMjkuMDQsNDkuNDUsMjUuMDgsNTBDMTUuMSw1MCw5LjIxLDQ1LjMyLDQuNTYsNDAuMjRsLjQ0LTEuMjZjLTIuNDQtMi44My00LjE2LTUuOTctNS4wNS05LjA2Yy0xLjI2LTQuNDYtMS4wNS04Ljg1LjI5LTEzLjI2bDMuMDktMTAuNzVjLS4xNC0uMDQtLjI5LS4wOC0uNDItLjExLS42OS0uMTUtMS40LS41NC0yLjI3LTEuMDktLjk1LS42MS0xLjY0LTEuMjItMi4wMi0xLjcyLS42My0uODMtMS4wOS0xLjk2LTEuNTQtMy4xOWwtLjQtMS4wMy4zMS0uNDZjLjA2LS4xMS4xMi0uMjMuMTgtLjM1Yy4xLS4yLjE5LS40LjI4LS42bDEuMTUtMi42MmwuMjgtLjYzLjY1LTEuNDljLjc4LTEuODIsMS40Mi0zLjIzLDEuNjQtMy40NWMuMjktLjI5LjYzLS42MSwxLjAzLTEuMTdsLTIuMDctMi4wNmwyLjEyLTIuMjljLS42MS0uMDQtMS4yMy4wOC0xLjgxLjQ3bC0uNzcuNTUtLjQuMjgtLjQ3LjMyLS41MS4zNy0xLjMzLjczLS45MS42My0uNDcuMy0uODMuMzUtMS42NC44NGMtLjU1LjI4LTEuMTEuNTctMS41MS44OGwtLjUxLjQxLS4zNy4zLS41LjM5LS43OC43LS45LjgzLTEuMDMuOTQtLjkuOTUtLjgzLjkuNzQtLjkxLS42NC43OC0uNTUuNjEtLjQ0LjYtLjYybC0uMi4yNS0xLjEzLTEuMzItLjU2LS42OS0uMjUtLjI4LS41LS41Ny0uNzEtLjgxLS41NS0uNjEtLjcxLS43Ni0uNzQtLjc3LS43My0uNjUtMS4wNC0uODQtMS40NC0uOThjLS4xNy0uMDYtLjMzLS4xMS0uNDgtLjE1bC0uMzItLjA4L-.MzMtLjA3LS4xLS4wMS0uMDUtLjAxLTIuMi0uMzItLjI3LjExLS4yNi41NC4wNC44Mi42MSwxLjIzLDEuNCwyLjQ2LDIuNTcsNC4xM2wxLjU2LDIuMzlDOC42OCwxNi4zNiwxMCwxOC4zNiwxMS41LDE4.OThM Mi40MywyNy4xNWMyLS45NC0xLjM2LTEuNzgtMi45OC0yLjQ3LTQuNzZDMi41LDExLjczLDcuNSw0LjE1LDE0LjYsMy4yNGwxLjM1LS4xOC4zNy0uMThjLjI0LS4xMi41LS4yNy43OC0uNDNsLjc3LS40MS4yNC0uMzhsLjItLjMzLjIxLS4zNy4xNi0uMzcuMTUtLjQyLjE3LS41My4xNC0uNjcuMTQtLjg0LjA2LTEuMTYuMDMtMS42NWwtLjAxLTEuNTRjLS4wNy0uMTUtLjEyLS4zMi0uMTQtLjQ5LS4wNy0uNTUtLjA1LTEuMDkuMDctMS42NmMuMy0xLjM1LjkyLTIuMjUsMS45OC0yLjM5cyIgc3R5bGU9ImZpbGw6IHJnYigyMiwgMTYwLCAxNTYpIiAvPjwvc3ZnPg==" alt="Odoo Logo" />
+                    <h2>Success Pack Report</h2>
+                </div>
+                <div class="report-section">
+                    <strong>Report Date:</strong> ${new Date().toLocaleDateString()}
+                </div>
+                <div class="report-section">
+                    <strong>Selected Parameters:</strong>
+                    <ul>
+                        <li>Success Pack: ${hours} Hours</li>
+                        <li>Discount: ${discount}%</li>
+                        <li>Currency: ${currency}</li>
+                    </ul>
+                </div>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Standard Rate</td>
+                            <td>${standardRate}</td>
+                        </tr>
+                        <tr>
+                            <td>After Discount Price</td>
+                            <td>${afterDiscountPrice}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Saving</td>
+                            <td>${totalSaving}</td>
+                        </tr>
+                        <tr>
+                            <td>GST (18%)</td>
+                            <td>${gstAmount}</td>
+                        </tr>
+                        <tr>
+                            <td>Final Price (18% GST Incl.)</td>
+                            <td>${finalPrice}</td>
+                        </tr>
+                        <tr>
+                            <td>Per Hour Rate (After Discount)</td>
+                            <td>${perHourAfterDiscount}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="report-footer">
+                    Generated by Odoo Success Pack Calculator.
+                </div>
+            `;
+
+            printArea.innerHTML = reportContent;
+            window.print();
+        }
+
+        hoursInput.addEventListener('change', calculateAndDraw);
+        discountInput.addEventListener('input', calculateAndDraw);
+        targetAmountInput.addEventListener('input', calculateAndDraw);
+        
+        window.onload = function() {
+            calculateAndDraw();
+        }
+    </script>
+</body>
+</html>
+
