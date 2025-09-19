@@ -267,9 +267,37 @@
             cursor: pointer;
         }
     </style>
+    <style>
+  .nav-buttons {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0;
+  }
+
+  .btn {
+    padding: 12px 25px;
+    background-color: #4CAF50; /* nice green */
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .btn:hover {
+    background-color: #45a049; /* darker green on hover */
+    transform: translateY(-2px);
+  }
+</style>
+
 </head>
 <body class="antialiased">
-
+    <div class="nav-buttons">
+  <a href="index.html" class="btn">Home</a>
+  <a href="Multi Year Calculator_Final.html" class="btn">Multi Year Calculator</a>
+  <a href="Success_Pack_Real_calc.html" class="btn">Success Pack Real Calc</a>
+</div>
 <div class="min-h-screen py-6 px-3 md:py-8 md:px-4">
     
     <!-- Floating Header -->
