@@ -182,10 +182,128 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
             border: 1px solid rgba(255, 255, 255, 0.7);
         }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            width: 200px;
+            line-height: 1.4;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .info-icon {
+            animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+            background: var(--apple-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 10px 18px;
+            border-radius: 9999px;
+            background: linear-gradient(45deg, #00C9FF, #92FE9D);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        .print-btn:active {
+            transform: translateY(0);
+        }
+
+        .print-report {
+            display: none;
+        }
+
+        @media print {
+            body {
+                background: none;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 0;
+            }
+            .main-container {
+                display: none;
+            }
+            .print-btn {
+                display: none;
+            }
+            .print-report {
+                display: block;
+                box-shadow: none;
+                border: none;
+                background: none;
+            }
+            .chart-container {
+                padding: 0;
+                border: none;
+            }
+            .print-report h1, .print-report h2, .print-report p, .print-report span, .print-report li {
+                color: #000 !important;
+                -webkit-text-fill-color: #000 !important;
+            }
+            .print-report .highlight {
+                -webkit-text-fill-color: var(--apple-blue) !important;
+            }
+            .print-report .info-icon {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body class="p-6 md:p-10">
-
+    <button id="print-btn" class="print-btn">Print Your Report</button>
     <div class="max-w-7xl mx-auto p-8 main-container">
         <header class="text-center mb-12">
             <h1 class="text-4xl md:text-6xl font-bold section-header mb-3">Odoo Multi Year Contracts</h1>
@@ -213,7 +331,9 @@
             <h2 class="text-2xl font-bold section-header mb-4">Choose Your Contract Duration</h2>
             <div class="flex justify-center flex-wrap gap-4">
                 <button id="1year-btn" class="contract-btn active">1 Year</button>
+                <button id="2year-btn" class="contract-btn">2 Years</button>
                 <button id="3year-btn" class="contract-btn">3 Years</button>
+                <button id="4year-btn" class="contract-btn">4 Years</button>
                 <button id="5year-btn" class="contract-btn">5 Years</button>
             </div>
         </div>
@@ -242,19 +362,21 @@
 
         <div id="non-contract-section" class="mt-12 text-center">
             <h2 class="text-2xl sm:text-3xl font-semibold section-header mb-6">Non-Contract Pricing</h2>
-            <div id="non-contract-summary" class="p-8 rounded-2xl mb-8 card text-left">
+            <div id="non-contract-summary" class="p-8 rounded-2xl mb-8 card text-center">
                  <!-- Non-contract summary will be dynamically injected here -->
             </div>
         </div>
     </div>
-
+    <div id="print-report-container"></div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const standardPlan = {
                 basePrice: 8700,
                 discounts: {
                     year1: 0.20,
+                    year2: { year1: 0.20, years2: 0.05 },
                     year3: { year1: 0.20, years2_3: 0.10 },
+                    year4: { year1: 0.20, years2_4: 0.125 },
                     year5: { year1: 0.20, years2_5: 0.15 }
                 }
             };
@@ -262,7 +384,10 @@
                 basePrice: 13800,
                 discounts: {
                     year1_amount: 3120,
+                    year1_percent: (3120 / 13800) * 100,
+                    year2: { year1_amount: 3120, years2: 0.05 },
                     year3: { year1_amount: 3120, years2_3: 0.10 },
+                    year4: { year1_amount: 3120, years2_4: 0.125 },
                     year5: { year1_amount: 3120, years2_5: 0.15 }
                 }
             };
@@ -277,6 +402,8 @@
             const nonContractSummaryDiv = document.getElementById('non-contract-summary');
             const priceChartCanvas = document.getElementById('priceChart').getContext('2d');
             const savingsChartCanvas = document.getElementById('savingsChart').getContext('2d');
+            const printBtn = document.getElementById('print-btn');
+            const printReportContainer = document.getElementById('print-report-container');
 
             let currentPlan = 'standard';
             let currentContract = '1year';
@@ -288,41 +415,52 @@
             const calculateStandard = (users) => {
                 const basePrice = standardPlan.basePrice * users;
                 const year1Discounted = basePrice * (1 - standardPlan.discounts.year1);
-                const year2_3Discounted = basePrice * (1 - standardPlan.discounts.year3.years2_3);
-                const year2_5Discounted = basePrice * (1 - standardPlan.discounts.year5.years2_5);
                 
-                const price1Y = year1Discounted;
-                const price3Y = year1Discounted + (year2_3Discounted * 2);
-                const price5Y = year1Discounted + (year2_5Discounted * 4);
-                
-                const price1Y_gst = price1Y * GST_RATE;
-                const price3Y_gst = price3Y * GST_RATE;
-                const price5Y_gst = price5Y * GST_RATE;
-                
-                const price1Y_final = price1Y + price1Y_gst;
-                const price3Y_final = price3Y + price3Y_gst;
-                const price5Y_final = price5Y + price5Y_gst;
+                const year2_discounted = basePrice * (1 - standardPlan.discounts.year2.years2);
+                const year2_3_discounted = basePrice * (1 - standardPlan.discounts.year3.years2_3);
+                const year2_4_discounted = basePrice * (1 - standardPlan.discounts.year4.years2_4);
+                const year2_5_discounted = basePrice * (1 - standardPlan.discounts.year5.years2_5);
 
-                // Non-contract price for 3-year comparison: (First year discounted price + 2X base price of standard plan)
-                const nonContract3Y = year1Discounted + (basePrice * 2);
-                const nonContract3Y_final = nonContract3Y + (nonContract3Y * GST_RATE);
-                const savings3Y = nonContract3Y_final - price3Y_final;
-                const savingsPercent3Y = (savings3Y / nonContract3Y_final) * 100;
+                const price1Y = year1Discounted;
+                const price2Y = year1Discounted + year2_discounted;
+                const price3Y = year1Discounted + (year2_3_discounted * 2);
+                const price4Y = year1Discounted + (year2_4_discounted * 3);
+                const price5Y = year1Discounted + (year2_5_discounted * 4);
                 
-                // Non-contract price for 5-year comparison: (First year discounted price + 4X base price of standard plan)
+                const price1Y_final = price1Y * (1 + GST_RATE);
+                const price2Y_final = price2Y * (1 + GST_RATE);
+                const price3Y_final = price3Y * (1 + GST_RATE);
+                const price4Y_final = price4Y * (1 + GST_RATE);
+                const price5Y_final = price5Y * (1 + GST_RATE);
+                
+                const nonContract2Y = year1Discounted + (basePrice * 1);
+                const nonContract3Y = year1Discounted + (basePrice * 2);
+                const nonContract4Y = year1Discounted + (basePrice * 3);
                 const nonContract5Y = year1Discounted + (basePrice * 4);
-                const nonContract5Y_final = nonContract5Y + (nonContract5Y * GST_RATE);
+                
+                const nonContract2Y_final = nonContract2Y * (1 + GST_RATE);
+                const nonContract3Y_final = nonContract3Y * (1 + GST_RATE);
+                const nonContract4Y_final = nonContract4Y * (1 + GST_RATE);
+                const nonContract5Y_final = nonContract5Y * (1 + GST_RATE);
+                
+                const savings2Y = nonContract2Y_final - price2Y_final;
+                const savings3Y = nonContract3Y_final - price3Y_final;
+                const savings4Y = nonContract4Y_final - price4Y_final;
                 const savings5Y = nonContract5Y_final - price5Y_final;
+
+                const savingsPercent2Y = (savings2Y / nonContract2Y_final) * 100;
+                const savingsPercent3Y = (savings3Y / nonContract3Y_final) * 100;
+                const savingsPercent4Y = (savings4Y / nonContract4Y_final) * 100;
                 const savingsPercent5Y = (savings5Y / nonContract5Y_final) * 100;
 
                 return {
-                    basePrice, year1Discounted, year2_3Discounted, year2_5Discounted,
-                    price1Y, price3Y, price5Y,
-                    price1Y_final, price3Y_final, price5Y_final,
-                    price1Y_gst, price3Y_gst, price5Y_gst,
-                    savings3Y, savings5Y,
-                    savingsPercent3Y, savingsPercent5Y,
-                    nonContract3Y_final, nonContract5Y_final
+                    basePrice, year1Discounted,
+                    year2_discounted, year2_3_discounted, year2_4_discounted, year2_5_discounted,
+                    price1Y, price2Y, price3Y, price4Y, price5Y,
+                    price1Y_final, price2Y_final, price3Y_final, price4Y_final, price5Y_final,
+                    savings2Y, savings3Y, savings4Y, savings5Y,
+                    savingsPercent2Y, savingsPercent3Y, savingsPercent4Y, savingsPercent5Y,
+                    nonContract2Y_final, nonContract3Y_final, nonContract4Y_final, nonContract5Y_final
                 };
             };
 
@@ -330,47 +468,79 @@
                 const basePrice = customPlan.basePrice * users;
                 const year1DiscountAmount = customPlan.discounts.year1_amount * users;
                 const year1Discounted = basePrice - year1DiscountAmount;
-                const year2_3Discounted = basePrice * (1 - customPlan.discounts.year3.years2_3);
-                const year2_5Discounted = basePrice * (1 - customPlan.discounts.year5.years2_5);
+                
+                const year2_discounted = basePrice * (1 - customPlan.discounts.year2.years2);
+                const year2_3_discounted = basePrice * (1 - customPlan.discounts.year3.years2_3);
+                const year2_4_discounted = basePrice * (1 - customPlan.discounts.year4.years2_4);
+                const year2_5_discounted = basePrice * (1 - customPlan.discounts.year5.years2_5);
                 
                 const price1Y = year1Discounted;
-                const price3Y = year1Discounted + (year2_3Discounted * 2);
-                const price5Y = year1Discounted + (year2_5Discounted * 4);
+                const price2Y = year1Discounted + year2_discounted;
+                const price3Y = year1Discounted + (year2_3_discounted * 2);
+                const price4Y = year1Discounted + (year2_4_discounted * 3);
+                const price5Y = year1Discounted + (year2_5_discounted * 4);
 
-                const price1Y_gst = price1Y * GST_RATE;
-                const price3Y_gst = price3Y * GST_RATE;
-                const price5Y_gst = price5Y * GST_RATE;
-
-                const price1Y_final = price1Y + price1Y_gst;
-                const price3Y_final = price3Y + price3Y_gst;
-                const price5Y_final = price5Y + price5Y_gst;
+                const price1Y_final = price1Y * (1 + GST_RATE);
+                const price2Y_final = price2Y * (1 + GST_RATE);
+                const price3Y_final = price3Y * (1 + GST_RATE);
+                const price4Y_final = price4Y * (1 + GST_RATE);
+                const price5Y_final = price5Y * (1 + GST_RATE);
                 
-                // Non-contract price for 3-year comparison: (First year discounted price + 2X base price of custom plan)
+                const nonContract2Y = year1Discounted + (basePrice * 1);
                 const nonContract3Y = year1Discounted + (basePrice * 2);
-                const nonContract3Y_final = nonContract3Y + (nonContract3Y * GST_RATE);
-                const savings3Y = nonContract3Y_final - price3Y_final;
-                const savingsPercent3Y = (savings3Y / nonContract3Y_final) * 100;
-
-                // Non-contract price for 5-year comparison: (First year discounted price + 4X base price of custom plan)
+                const nonContract4Y = year1Discounted + (basePrice * 3);
                 const nonContract5Y = year1Discounted + (basePrice * 4);
-                const nonContract5Y_final = nonContract5Y + (nonContract5Y * GST_RATE);
+
+                const nonContract2Y_final = nonContract2Y * (1 + GST_RATE);
+                const nonContract3Y_final = nonContract3Y * (1 + GST_RATE);
+                const nonContract4Y_final = nonContract4Y * (1 + GST_RATE);
+                const nonContract5Y_final = nonContract5Y * (1 + GST_RATE);
+                
+                const savings2Y = nonContract2Y_final - price2Y_final;
+                const savings3Y = nonContract3Y_final - price3Y_final;
+                const savings4Y = nonContract4Y_final - price4Y_final;
                 const savings5Y = nonContract5Y_final - price5Y_final;
+                
+                const savingsPercent2Y = (savings2Y / nonContract2Y_final) * 100;
+                const savingsPercent3Y = (savings3Y / nonContract3Y_final) * 100;
+                const savingsPercent4Y = (savings4Y / nonContract4Y_final) * 100;
                 const savingsPercent5Y = (savings5Y / nonContract5Y_final) * 100;
 
                 return {
-                    basePrice, year1Discounted, year2_3Discounted, year2_5Discounted, year1DiscountAmount,
-                    price1Y, price3Y, price5Y,
-                    price1Y_final, price3Y_final, price5Y_final,
-                    price1Y_gst, price3Y_gst, price5Y_gst,
-                    savings3Y, savings5Y,
-                    savingsPercent3Y, savingsPercent5Y,
-                    nonContract3Y_final, nonContract5Y_final
+                    basePrice, year1Discounted, year1DiscountAmount,
+                    year2_discounted, year2_3_discounted, year2_4_discounted, year2_5_discounted,
+                    price1Y, price2Y, price3Y, price4Y, price5Y,
+                    price1Y_final, price2Y_final, price3Y_final, price4Y_final, price5Y_final,
+                    savings2Y, savings3Y, savings4Y, savings5Y,
+                    savingsPercent2Y, savingsPercent3Y, savingsPercent4Y, savingsPercent5Y,
+                    nonContract2Y_final, nonContract3Y_final, nonContract4Y_final, nonContract5Y_final
                 };
             };
 
             const renderPricingSummary = (planType, contractDuration, users) => {
                 const data = planType === 'standard' ? calculateStandard(users) : calculateCustom(users);
+                const basePricePerUser = planType === 'standard' ? standardPlan.basePrice : customPlan.basePrice;
+                const years = parseInt(contractDuration.replace('year', ''));
+                const basePriceTotal = basePricePerUser * users * years;
+                
                 let contentHtml = '';
+
+                // HTML for the info icon and tooltip
+                const infoIconHtml = `
+                    <div class="inline-block relative">
+                        <span class="tooltip ml-2 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="info-icon" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="M8.93 6.588l.276-.276a.35.35 0 0 0-.464-.547c-.43.272-.943.513-1.465.753-.522.24-.87.525-1.07.828-.21.314-.265.656-.265 1.05a1.04 1.04 0 0 0 .194.611c.143.195.342.339.638.455.297.116.634.195 1.008.237a.35.35 0 0 0 .34-.467c-.126-.2-.31-.295-.582-.412-.272-.117-.468-.247-.59-.408-.12-.15-.18-.31-.18-.466 0-.323.23-.497.523-.623.292-.126.685-.188-1.18-.218.495-.03.888-.042 1.258-.042.35 0 .685.012.92.036.236.024.42.06.55.107.13.047.228.106.29.177.062.071.1.157.1.252 0 .142-.08.275-.25.405l-.265.233a.35.35 0 0 0-.466.547c.43-.272.943-.513 1.465-.753.522-.24.87-.525 1.07-.828.21-.314.265-.656.265-1.05a1.04 1.04 0 0 0-.194-.611c-.143-.195-.342-.339-.638-.455-.297-.116-.634-.195-1.008-.237a.35.35 0 0 0-.34.467c.126.2.31.295.582.412.272.117.468.247.59.408.12.15.18.31.18.466 0 .323-.23.497-.523.623-.292.126-.685-.188-1.18-.218z"/>
+                            </svg>
+                            <span class="tooltiptext">
+                                Base Price for ${users} users for ${years} years:<br>
+                                ${users} users x ${formatCurrency(basePricePerUser)}/user x ${years} years =<br>
+                                ${formatCurrency(basePriceTotal)}
+                            </span>
+                        </span>
+                    </div>
+                `;
 
                 if (contractDuration === '1year') {
                     contentHtml = `
@@ -381,21 +551,58 @@
                             <div class="mt-4 p-4 card rounded-xl text-left">
                                 <h4 class="text-lg font-semibold text-gray-900 mb-2">Breakdown</h4>
                                 <ul class="text-sm text-gray-600 space-y-1">
-                                    <li>Base Price: <span class="font-bold text-gray-800">${formatCurrency(planType === 'standard' ? standardPlan.basePrice * users : customPlan.basePrice * users)}</span></li>
-                                    <li>Year 1 (${planType === 'standard' ? `${(standardPlan.discounts.year1 * 100).toFixed(0)}% discount` : `₹${customPlan.discounts.year1_amount} per user discount`}): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
+                                    <li>Base Price for ${users} users for 1 year: ${formatCurrency(basePriceTotal)} ${infoIconHtml}</li>
+                                    <li>Year 1 (${planType === 'standard' ? `${(standardPlan.discounts.year1 * 100).toFixed(0)}%` : `${customPlan.discounts.year1_percent.toFixed(2)}%`} discount): <span class="font-bold text-gray-800">${formatCurrency(data.price1Y)}</span></li>
                                     <li class="border-t border-gray-300 pt-2 mt-2">Subtotal: <span class="font-bold text-gray-800">${formatCurrency(data.price1Y)}</span></li>
-                                    <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price1Y_gst)}</span></li>
+                                    <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price1Y_final - data.price1Y)}</span></li>
                                 </ul>
+                            </div>
+                        </div>
+                    `;
+                } else if (contractDuration === '2year') {
+                    const breakdownText = planType === 'standard' ? `
+                        <li>Year 1 (${(standardPlan.discounts.year2.year1 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
+                        <li>Year 2 (${(standardPlan.discounts.year2.years2 * 100).toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_discounted)}</span></li>
+                    ` : `
+                        <li>Year 1 (${customPlan.discounts.year1_percent.toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
+                        <li>Year 2 (${(customPlan.discounts.year2.years2 * 100).toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_discounted)}</span></li>
+                    `;
+                    const avgYearlyCost = data.price2Y_final / 2;
+                    contentHtml = `
+                        <div class="text-center">
+                            <h3 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">2-Year Plan Price</h3>
+                            <p class="text-4xl sm:text-5xl font-bold highlight mb-4">${formatCurrency(data.price2Y_final)}</p>
+                            <p class="text-base sm:text-lg text-gray-600 mb-6">Total price for ${users} users, including GST.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 text-left">
+                                <div class="p-4 card rounded-xl">
+                                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Breakdown</h4>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>Base Price for ${users} users for 2 years: ${formatCurrency(basePriceTotal)} ${infoIconHtml}</li>
+                                        ${breakdownText}
+                                        <li class="border-t border-gray-300 pt-2 mt-2">Subtotal: <span class="font-bold text-gray-800">${formatCurrency(data.price2Y)}</span></li>
+                                        <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price2Y_final - data.price2Y)}</span></li>
+                                        <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price2Y_final)}</span></li>
+                                        <li class="font-semibold text-gray-800">Average Yearly Cost (inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
+                                    </ul>
+                                </div>
+                                <div class="p-4 card rounded-xl">
+                                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Savings</h4>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>Total Savings: <span class="font-bold text-green-600">${formatCurrency(data.savings2Y)}</span></li>
+                                        <li>Savings Rate: <span class="font-bold text-green-600">${data.savingsPercent2Y.toFixed(2)}%</span></li>
+                                        <li class="mt-2 text-xs text-gray-500">vs. non-contract price for 2 years.</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     `;
                 } else if (contractDuration === '3year') {
                     const breakdownText = planType === 'standard' ? `
                         <li>Year 1 (${(standardPlan.discounts.year3.year1 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2-3 (${(standardPlan.discounts.year3.years2_3 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_3Discounted)}</span></li>
+                        <li>Year 2-3 (${(standardPlan.discounts.year3.years2_3 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_3_discounted)}</span></li>
                     ` : `
-                        <li>Year 1 (₹${customPlan.discounts.year3.year1_amount} per user discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2-3 (${(customPlan.discounts.year3.years2_3 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_3Discounted)}</span></li>
+                        <li>Year 1 (${customPlan.discounts.year1_percent.toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
+                        <li>Year 2-3 (${(customPlan.discounts.year3.years2_3 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_3_discounted)}</span></li>
                     `;
                     const avgYearlyCost = data.price3Y_final / 3;
                     contentHtml = `
@@ -407,10 +614,10 @@
                                 <div class="p-4 card rounded-xl">
                                     <h4 class="text-lg font-semibold text-gray-900 mb-2">Breakdown</h4>
                                     <ul class="text-sm text-gray-600 space-y-1">
-                                        <li>Base Price: <span class="font-bold text-gray-800">${formatCurrency(planType === 'standard' ? standardPlan.basePrice * users * 3 : customPlan.basePrice * users * 3)}</span></li>
+                                        <li>Base Price for ${users} users for 3 years: ${formatCurrency(basePriceTotal)} ${infoIconHtml}</li>
                                         ${breakdownText}
                                         <li class="border-t border-gray-300 pt-2 mt-2">Subtotal: <span class="font-bold text-gray-800">${formatCurrency(data.price3Y)}</span></li>
-                                        <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price3Y_gst)}</span></li>
+                                        <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price3Y_final - data.price3Y)}</span></li>
                                         <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price3Y_final)}</span></li>
                                         <li class="font-semibold text-gray-800">Average Yearly Cost (inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
                                     </ul>
@@ -426,13 +633,50 @@
                             </div>
                         </div>
                     `;
+                } else if (contractDuration === '4year') {
+                    const breakdownText = planType === 'standard' ? `
+                        <li>Year 1 (${(standardPlan.discounts.year4.year1 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
+                        <li>Year 2-4 (${(standardPlan.discounts.year4.years2_4 * 100).toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_4_discounted)}</span></li>
+                    ` : `
+                        <li>Year 1 (${customPlan.discounts.year1_percent.toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
+                        <li>Year 2-4 (${(customPlan.discounts.year4.years2_4 * 100).toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_4_discounted)}</span></li>
+                    `;
+                    const avgYearlyCost = data.price4Y_final / 4;
+                    contentHtml = `
+                        <div class="text-center">
+                            <h3 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">4-Year Plan Price</h3>
+                            <p class="text-4xl sm:text-5xl font-bold highlight mb-4">${formatCurrency(data.price4Y_final)}</p>
+                            <p class="text-base sm:text-lg text-gray-600 mb-6">Total price for ${users} users, including GST.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 text-left">
+                                <div class="p-4 card rounded-xl">
+                                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Breakdown</h4>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>Base Price for ${users} users for 4 years: ${formatCurrency(basePriceTotal)} ${infoIconHtml}</li>
+                                        ${breakdownText}
+                                        <li class="border-t border-gray-300 pt-2 mt-2">Subtotal: <span class="font-bold text-gray-800">${formatCurrency(data.price4Y)}</span></li>
+                                        <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price4Y_final - data.price4Y)}</span></li>
+                                        <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price4Y_final)}</span></li>
+                                        <li class="font-semibold text-gray-800">Average Yearly Cost (inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
+                                    </ul>
+                                </div>
+                                <div class="p-4 card rounded-xl">
+                                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Savings</h4>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>Total Savings: <span class="font-bold text-green-600">${formatCurrency(data.savings4Y)}</span></li>
+                                        <li>Savings Rate: <span class="font-bold text-green-600">${data.savingsPercent4Y.toFixed(2)}%</span></li>
+                                        <li class="mt-2 text-xs text-gray-500">vs. non-contract price for 4 years.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 } else if (contractDuration === '5year') {
                     const breakdownText = planType === 'standard' ? `
                         <li>Year 1 (${(standardPlan.discounts.year5.year1 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2-5 (${(standardPlan.discounts.year5.years2_5 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_5Discounted)}</span></li>
+                        <li>Year 2-5 (${(standardPlan.discounts.year5.years2_5 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_5_discounted)}</span></li>
                     ` : `
-                        <li>Year 1 (₹${customPlan.discounts.year5.year1_amount} per user discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2-5 (${(customPlan.discounts.year5.years2_5 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_5Discounted)}</span></li>
+                        <li>Year 1 (${customPlan.discounts.year1_percent.toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
+                        <li>Year 2-5 (${(customPlan.discounts.year5.years2_5 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_5_discounted)}</span></li>
                     `;
                     const avgYearlyCost = data.price5Y_final / 5;
                     contentHtml = `
@@ -444,10 +688,10 @@
                                 <div class="p-4 card rounded-xl">
                                     <h4 class="text-lg font-semibold text-gray-900 mb-2">Breakdown</h4>
                                     <ul class="text-sm text-gray-600 space-y-1">
-                                        <li>Base Price: <span class="font-bold text-gray-800">${formatCurrency(planType === 'standard' ? standardPlan.basePrice * users * 5 : customPlan.basePrice * users * 5)}</span></li>
+                                        <li>Base Price for ${users} users for 5 years: ${formatCurrency(basePriceTotal)} ${infoIconHtml}</li>
                                         ${breakdownText}
                                         <li class="border-t border-gray-300 pt-2 mt-2">Subtotal: <span class="font-bold text-gray-800">${formatCurrency(data.price5Y)}</span></li>
-                                        <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price5Y_gst)}</span></li>
+                                        <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price5Y_final - data.price5Y)}</span></li>
                                         <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price5Y_final)}</span></li>
                                         <li class="font-semibold text-gray-800">Average Yearly Cost (inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
                                     </ul>
@@ -470,33 +714,32 @@
             const renderNonContractSummary = (planType, users) => {
                 const data = planType === 'standard' ? calculateStandard(users) : calculateCustom(users);
                 const basePrice = planType === 'standard' ? standardPlan.basePrice : customPlan.basePrice;
+                const years = parseInt(currentContract.replace('year', ''));
+                let nonContractPrice;
+                if (currentContract === '1year') {
+                    nonContractPrice = data.price1Y_final;
+                } else if (currentContract === '2year') {
+                    nonContractPrice = data.nonContract2Y_final;
+                } else if (currentContract === '3year') {
+                    nonContractPrice = data.nonContract3Y_final;
+                } else if (currentContract === '4year') {
+                    nonContractPrice = data.nonContract4Y_final;
+                } else if (currentContract === '5year') {
+                    nonContractPrice = data.nonContract5Y_final;
+                }
+
+                const nonContractExclGST = nonContractPrice / (1 + GST_RATE);
+                const nonContractGST = nonContractPrice - nonContractExclGST;
 
                 let contentHtml = `
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
                         <div class="p-4 card rounded-xl">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-2">1-Year Non-Contract Price</h4>
-                            <p class="text-3xl font-bold highlight">${formatCurrency(data.price1Y_final)}</p>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-2">${years}-Year Non-Contract Price</h4>
+                            <p class="text-3xl font-bold highlight">${formatCurrency(nonContractPrice)}</p>
                             <ul class="text-sm text-gray-600 mt-2">
-                                <li>Price (excl. GST): <span class="font-bold">${formatCurrency(data.price1Y)}</span></li>
-                                <li>+ 18% GST: <span class="font-bold">${formatCurrency(data.price1Y_gst)}</span></li>
-                            </ul>
-                        </div>
-                        <div class="p-4 card rounded-xl">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-2">3-Year Non-Contract Price</h4>
-                            <p class="text-3xl font-bold highlight">${formatCurrency(data.nonContract3Y_final)}</p>
-                            <ul class="text-sm text-gray-600 mt-2">
-                                <li>Year 1 Price: <span class="font-bold">${formatCurrency(data.year1Discounted)}</span></li>
-                                <li>Years 2 & 3 Price: <span class="font-bold">${formatCurrency(basePrice * users * 2)}</span></li>
-                                <li>+ Total GST: <span class="font-bold">${formatCurrency(data.nonContract3Y_final - (data.year1Discounted + (basePrice * users * 2)))}</span></li>
-                            </ul>
-                        </div>
-                        <div class="p-4 card rounded-xl">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-2">5-Year Non-Contract Price</h4>
-                            <p class="text-3xl font-bold highlight">${formatCurrency(data.nonContract5Y_final)}</p>
-                            <ul class="text-sm text-gray-600 mt-2">
-                                <li>Year 1 Price: <span class="font-bold">${formatCurrency(data.year1Discounted)}</span></li>
-                                <li>Years 2-5 Price: <span class="font-bold">${formatCurrency(basePrice * users * 4)}</span></li>
-                                <li>+ Total GST: <span class="font-bold">${formatCurrency(data.nonContract5Y_final - (data.year1Discounted + (basePrice * users * 4)))}</span></li>
+                                <li>Price (excl. GST): <span class="font-bold">${formatCurrency(nonContractExclGST)}</span></li>
+                                <li>+ 18% GST: <span class="font-bold">${formatCurrency(nonContractGST)}</span></li>
+                                <li class="mt-2 text-xs text-gray-500">Includes Year 1 discount and regular price for remaining years.</li>
                             </ul>
                         </div>
                     </div>
@@ -508,9 +751,28 @@
                 const data = planType === 'standard' ? calculateStandard(users) : calculateCustom(users);
                 const currencyFormatter = (value) => formatCurrency(value);
                 const savingsFormatter = (value) => `${value.toFixed(2)}%`;
+                
+                // Total price comparison for only the selected plan vs. non-contract
+                let totalLabels = ['Contract Price', 'Non-Contract Price'];
+                let totalData = [];
+                let totalColors = ['#9b51e0', '#d1d5db'];
 
-                const priceData = [data.price1Y_final, data.price3Y_final, data.price5Y_final];
-                const savingsData = [0, data.savingsPercent3Y, data.savingsPercent5Y];
+                if (currentContract === '1year') {
+                    totalData = [data.price1Y_final, data.price1Y_final];
+                    totalColors = ['#007aff', '#d1d5db'];
+                } else if (currentContract === '2year') {
+                    totalData = [data.price2Y_final, data.nonContract2Y_final];
+                    totalColors = ['#9b51e0', '#d1d5db'];
+                } else if (currentContract === '3year') {
+                    totalData = [data.price3Y_final, data.nonContract3Y_final];
+                    totalColors = ['#ec4899', '#d1d5db'];
+                } else if (currentContract === '4year') {
+                    totalData = [data.price4Y_final, data.nonContract4Y_final];
+                    totalColors = ['#4299e1', '#d1d5db'];
+                } else if (currentContract === '5year') {
+                    totalData = [data.price5Y_final, data.nonContract5Y_final];
+                    totalColors = ['#d946ef', '#d1d5db'];
+                }
 
                 if (priceChartInstance) {
                     priceChartInstance.destroy();
@@ -518,11 +780,11 @@
                 priceChartInstance = new Chart(priceChartCanvas, {
                     type: 'bar',
                     data: {
-                        labels: ['1 Year', '3 Years', '5 Years'],
+                        labels: totalLabels,
                         datasets: [{
-                            label: 'Total Contract Price',
-                            data: priceData,
-                            backgroundColor: ['#007aff', '#9b51e0', '#ec4899'],
+                            label: 'Total Price',
+                            data: totalData,
+                            backgroundColor: totalColors,
                             borderRadius: 12
                         }]
                     },
@@ -547,17 +809,18 @@
                     }
                 });
 
+                const savingsData = [0, data.savingsPercent2Y, data.savingsPercent3Y, data.savingsPercent4Y, data.savingsPercent5Y];
                 if (savingsChartInstance) {
                     savingsChartInstance.destroy();
                 }
                 savingsChartInstance = new Chart(savingsChartCanvas, {
                     type: 'bar',
                     data: {
-                        labels: ['1 Year', '3 Years', '5 Years'],
+                        labels: ['1 Year', '2 Years', '3 Years', '4 Years', '5 Years'],
                         datasets: [{
                             label: 'Savings Percentage',
                             data: savingsData,
-                            backgroundColor: ['#d1d5db', '#007aff', '#9b51e0'],
+                            backgroundColor: ['#d1d5db', '#007aff', '#9b51e0', '#4299e1', '#d946ef'],
                             borderRadius: 12
                         }]
                     },
@@ -588,6 +851,85 @@
                 renderPricingSummary(currentPlan, currentContract, users);
                 renderNonContractSummary(currentPlan, users);
                 updateCharts(currentPlan, users);
+            };
+
+            const generatePrintReport = (planType, contractDuration, users) => {
+                const data = planType === 'standard' ? calculateStandard(users) : calculateCustom(users);
+                const basePricePerUser = planType === 'standard' ? standardPlan.basePrice : customPlan.basePrice;
+                const years = parseInt(contractDuration.replace('year', ''));
+                const basePriceTotal = basePricePerUser * users * years;
+                const planName = planType.charAt(0).toUpperCase() + planType.slice(1);
+                
+                const getBreakdownHtml = () => {
+                    if (years === 1) {
+                        return `
+                            <li>Year 1 (${planType === 'standard' ? `${(standardPlan.discounts.year1 * 100).toFixed(0)}%` : `${customPlan.discounts.year1_percent.toFixed(2)}%`} discount): <span style="font-weight: bold;">${formatCurrency(data.price1Y)}</span></li>
+                        `;
+                    }
+                    const discountRate = planType === 'standard' ? standardPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`] : customPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`];
+                    return `
+                        <li>Year 1 Discounted Price: <span style="font-weight: bold;">${formatCurrency(data.year1Discounted)}</span></li>
+                        <li>Year 2-${years} (${(discountRate * 100).toFixed(2)}% discount): <span style="font-weight: bold;">${formatCurrency(data[`price${years}Y`] - data.year1Discounted)}</span></li>
+                    `;
+                };
+
+                const getNonContractPrice = () => {
+                    if (years === 1) return data.price1Y_final;
+                    return data[`nonContract${years}Y_final`];
+                };
+
+                const reportHtml = `
+                    <div class="print-report p-6 md:p-10" style="font-family: 'Inter', sans-serif;">
+                        <h1 style="font-size: 2.5rem; font-weight: bold; text-align: center; margin-bottom: 2rem;">Odoo Multi Year Contracts Report</h1>
+                        <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 2rem;">
+                            <div>
+                                <h3 style="font-size: 1.25rem; font-weight: 600;">Chosen Plan Name:</h3>
+                                <p style="font-size: 1.5rem; font-weight: bold; color: #007aff;">${planName}</p>
+                            </div>
+                            <div>
+                                <h3 style="font-size: 1.25rem; font-weight: 600;">Number of Users:</h3>
+                                <p style="font-size: 1.5rem; font-weight: bold; color: #007aff;">${users}</p>
+                            </div>
+                            <div>
+                                <h3 style="font-size: 1.25rem; font-weight: 600;">Selected Duration:</h3>
+                                <p style="font-size: 1.5rem; font-weight: bold; color: #007aff;">${years} Years</p>
+                            </div>
+                            <div>
+                                <h3 style="font-size: 1.25rem; font-weight: 600;">Base Price per User per Year:</h3>
+                                <p style="font-size: 1.5rem; font-weight: bold; color: #007aff;">${formatCurrency(basePricePerUser)}</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e5e7eb; margin-top: 1rem; margin-bottom: 2rem; text-align: center;">
+                            <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem;">Total Price and Breakdown</h2>
+                            <p style="font-size: 2.5rem; font-weight: bold; color: #9b51e0; margin-bottom: 0.5rem;">${formatCurrency(data[`price${years}Y_final`])}</p>
+                            <p style="font-size: 1rem; color: #6b7280; margin-bottom: 1.5rem;">Total Price for ${users} users, including GST.</p>
+                            <ul style="font-size: 0.875rem; color: #6b7280; line-height: 1.5rem; text-align: left; padding-left: 1rem; display: inline-block;">
+                                <li>Base Price for ${users} users for ${years} years: <span style="font-weight: bold; color: #1f2937;">${formatCurrency(basePriceTotal)}</span></li>
+                                ${getBreakdownHtml()}
+                                <li style="border-top: 1px solid #e5e7eb; padding-top: 0.5rem; margin-top: 0.5rem;">Total Price (excl. GST): <span style="font-weight: bold; color: #1f2937;">${formatCurrency(data[`price${years}Y`])}</span></li>
+                                <li>Total GST (18%): <span style="font-weight: bold; color: #1f2937;">${formatCurrency(data[`price${years}Y_final`] - data[`price${years}Y`])}</span></li>
+                            </ul>
+                        </div>
+                        
+                        <div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e5e7eb; margin-bottom: 2rem; text-align: center;">
+                            <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem;">Non-Contract Pricing</h2>
+                            <p style="font-size: 2.5rem; font-weight: bold; color: #007aff;">${formatCurrency(getNonContractPrice())}</p>
+                            <p style="font-size: 1rem; color: #6b7280;">Total non-contract price for ${years} years, including GST.</p>
+                        </div>
+                        
+                        <div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e5e7eb; margin-bottom: 2rem; text-align: center;">
+                            <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem;">Savings Information</h2>
+                            <p style="font-size: 2.5rem; font-weight: bold; color: #22c55e; margin-bottom: 0.5rem;">${formatCurrency(data[`savings${years}Y`])}</p>
+                            <p style="font-size: 1rem; color: #6b7280; margin-bottom: 1.5rem;">Total savings over the contract duration.</p>
+                            <p style="font-size: 2.5rem; font-weight: bold; color: #22c55e; margin-bottom: 0.5rem;">${data[`savingsPercent${years}Y`].toFixed(2)}%</p>
+                            <p style="font-size: 1rem; color: #6b7280;">Savings rate compared to non-contract price.</p>
+                        </div>
+                    </div>
+                `;
+
+                printReportContainer.innerHTML = reportHtml;
+                window.print();
             };
 
             usersInput.addEventListener('input', () => {
@@ -623,6 +965,10 @@
                     currentContract = btn.id.replace('-btn', '');
                     updateUI();
                 });
+            });
+
+            printBtn.addEventListener('click', () => {
+                generatePrintReport(currentPlan, currentContract, parseInt(usersInput.value));
             });
 
             updateUI();
