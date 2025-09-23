@@ -273,31 +273,44 @@
                 margin: 0;
                 padding: 0;
             }
-            .main-container {
-                display: none;
+            
+            /* Hide all interactive elements during print */
+            .main-container,
+            .print-btn,
+            .nav-container,
+            .nav-btn,
+            .tab-toggle-group,
+            .tab-toggle-btn,
+            .contract-btn,
+            button,
+            input,
+            .tooltip,
+            .info-icon,
+            canvas {
+                display: none !important;
             }
-            .print-btn {
-                display: none;
-            }
+            
             .print-report {
-                display: block;
+                display: block !important;
                 box-shadow: none;
                 border: none;
                 background: none;
             }
-            .chart-container {
-                padding: 0;
-                border: none;
-            }
+            
             .print-report h1, .print-report h2, .print-report p, .print-report span, .print-report li {
                 color: #000 !important;
                 -webkit-text-fill-color: #000 !important;
             }
+            
             .print-report .highlight {
                 -webkit-text-fill-color: var(--apple-blue) !important;
+                color: var(--apple-blue) !important;
             }
-            .print-report .info-icon {
-                display: none;
+            
+            /* Ensure proper page layout for print */
+            .print-report * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
             }
         }
     </style>
@@ -918,13 +931,13 @@
                             <p style="font-size: 1rem; color: #6b7280;">Total non-contract price for ${years} years, including GST.</p>
                         </div>
                         
-                        <div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e5e7eb; margin-bottom: 2rem; text-align: center;">
+                        ${years > 1 ? `<div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e5e7eb; margin-bottom: 2rem; text-align: center;">
                             <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem;">Savings Information</h2>
                             <p style="font-size: 2.5rem; font-weight: bold; color: #22c55e; margin-bottom: 0.5rem;">${formatCurrency(data[`savings${years}Y`])}</p>
                             <p style="font-size: 1rem; color: #6b7280; margin-bottom: 1.5rem;">Total savings over the contract duration.</p>
                             <p style="font-size: 2.5rem; font-weight: bold; color: #22c55e; margin-bottom: 0.5rem;">${data[`savingsPercent${years}Y`].toFixed(2)}%</p>
                             <p style="font-size: 1rem; color: #6b7280;">Savings rate compared to non-contract price.</p>
-                        </div>
+                        </div>` : ''}
                     </div>
                 `;
 
