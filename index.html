@@ -510,14 +510,15 @@
                 <canvas id="cost-chart"></canvas>
             </div>
         </div>
+        
     </div>
 
     
     <!-- Contact Footer -->
     <footer class="contact-card rounded-2xl p-5 md:p-6 text-center">
         <div class="mb-5">
-            <h3 class="text-2xl sm:text-3xl font-bold mb-2">🎯 Do You Have Suggestion for Improvement?</h3>
-            <p class="text-base sm:text-xl text-gray-700">Connect with me on Discord </p>
+            <h3 class="text-2xl sm:text-3xl font-bold mb-2">🎯 Do You Have Any Cool Idea For This Project?</h3>
+            <p class="text-base sm:text-xl text-gray-700">Connect with Me On Discord </p>
         </div>
         
         <div class="bg-white/10 rounded-xl p-5 max-w-sm mx-auto">
@@ -538,7 +539,7 @@
     <div class="modal-content p-4 md:p-6">
         <span class="modal-close">&times;</span>
         <h2 class="text-3xl sm:text-4xl font-black text-gray-800 text-center mb-6">
-            Odoo Plan Comparison Table
+            Plan Comparison
         </h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -547,7 +548,7 @@
                 <h3 class="text-xl sm:text-2xl font-bold text-purple-600 mb-3">✨ Standard Plan</h3>
                 <h4 class="text-lg sm:text-xl font-semibold text-gray-700 mb-2">Benefits:</h4>
                 <ul class="list-disc list-inside space-y-2 text-base sm:text-lg text-gray-600 mb-4">
-                    <li>Access to all apps( Except Odoo Studio and Automation)</li>
+                    <li>Access to all apps</li>
                     <li>Hosting: Odoo Online only</li>
                 </ul>
                 
@@ -691,12 +692,31 @@
         </div>
         
         <div class="flex flex-col items-center mt-6">
-             <button id="copy-to-clipboard-btn" class="px-6 py-3 rounded-full font-bold text-white transition-all duration-300 hover:scale-105" style="background: linear-gradient(135deg, #06b6d4, #10b981);">
-                📋 Copy Pricing Breakdown
+            <button id="print-analysis-btn-modal" 
+                    class="px-6 py-3 rounded-full font-bold text-white transition-all duration-300 hover:scale-105" 
+                    style="background: linear-gradient(135deg, #06b6d4, #10b981);">
+                🖨️ Print Cost Analysis
             </button>
-            <span id="copy-message" class="text-green-600 font-semibold mt-2 hidden">Copied!</span>
         </div>
         
+    </div>
+</div>
+
+<!-- Print Options Modal -->
+<div id="print-modal" class="modal">
+    <div class="modal-content p-6 text-center">
+        <span class="modal-close">&times;</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-gray-800 mb-6">
+            Choose a Plan to Print
+        </h2>
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <button id="print-standard-btn" class="px-6 py-3 rounded-full font-bold text-white transition-all duration-300 hover:scale-105" style="background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));">
+                ✨ Odoo Standard Plan
+            </button>
+            <button id="print-custom-btn" class="px-6 py-3 rounded-full font-bold text-white transition-all duration-300 hover:scale-105" style="background: linear-gradient(135deg, var(--ios-purple), var(--ios-teal));">
+                🚀 Odoo Custom Plan
+            </button>
+        </div>
     </div>
 </div>
 
@@ -712,6 +732,29 @@
             monthly: { base: 1420, discount: -280 }
         }
     };
+    
+    // Plan benefits data structure
+    const planBenefits = {
+        standard: {
+            title: "Standard Plan",
+            icon: "✨",
+            benefits: [
+                "Access to all apps( Except Odoo Studio and Automation)",
+                "Hosting: Odoo Online only"
+            ]
+        },
+        custom: {
+            title: "Custom Plan",
+            icon: "🚀",
+            benefits: [
+                "All apps",
+                "Odoo Online / Odoo.sh / On-premise",
+                "Odoo Studio",
+                "Multi-Company",
+                "External API"
+            ]
+        }
+    };
 
     // DOM elements
     const numUsersInput = document.getElementById('num-users');
@@ -722,9 +765,14 @@
     const yearToggleBtn = document.getElementById('year-toggle-btn');
     const comparePlansBtn = document.getElementById('compare-plans-btn');
     const compareModal = document.getElementById('compare-modal');
-    const modalCloseBtn = document.querySelector('.modal-close');
-    const copyBtn = document.getElementById('copy-to-clipboard-btn');
-    const copyMessage = document.getElementById('copy-message');
+    const printAnalysisBtn = document.getElementById('print-analysis-btn');
+    const printAnalysisBtnModal = document.getElementById('print-analysis-btn-modal');
+    const printModal = document.getElementById('print-modal');
+    const printStandardBtn = document.getElementById('print-standard-btn');
+    const printCustomBtn = document.getElementById('print-custom-btn');
+    const allModals = document.querySelectorAll('.modal');
+    const allModalCloseBtns = document.querySelectorAll('.modal-close');
+
     
     // Display elements
     const elements = {
@@ -826,7 +874,7 @@
 
     // Currency formatter
     const formatCurrency = (value) => {
-        return `Rs. ${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `₹${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
 
     // Add smooth number animation
@@ -1019,40 +1067,184 @@
         document.getElementById('compare-custom-per-user-renewal').textContent = formatCurrency(customRenewalPerUserPerMonth);
     }
     
-    // Function to generate and copy the pricing summary to the clipboard
-    function copyPricingSummary() {
+    // Function to generate and print a professional report
+    function generateAndPrintReport(planType) {
         const numUsers = parseInt(numUsersInput.value, 10);
-        const standardPlanRates = pricingData.standard.yearly;
-        const customPlanRates = pricingData.custom.yearly;
-        
-        const standardFirstYearPrice = (standardPlanRates.base + standardPlanRates.discount) * numUsers * 1.18;
-        const standardRenewalPrice = standardPlanRates.base * numUsers * 1.18;
-        const customFirstYearPrice = (customPlanRates.base + customPlanRates.discount) * numUsers * 1.18;
-        const customRenewalPrice = customPlanRates.base * numUsers * 1.18;
-        
-        const summary = `Odoo Pricing Breakdown for ${numUsers} Users:\n\n` +
-                        `Standard Plan:\n` +
-                        `  First Year: ${formatCurrency(standardFirstYearPrice)}\n` +
-                        `  Renewal: ${formatCurrency(standardRenewalPrice)}\n\n` +
-                        `Custom Plan:\n` +
-                        `  First Year: ${formatCurrency(customFirstYearPrice)}\n` +
-                        `  Renewal: ${formatCurrency(customRenewalPrice)}`;
-                        
-        // Use an old-school method for broader compatibility in some environments
-        const tempTextArea = document.createElement('textarea');
-        tempTextArea.value = summary;
-        document.body.appendChild(tempTextArea);
-        tempTextArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempTextArea);
-        
-        // Show confirmation message
-        copyMessage.classList.remove('hidden');
-        setTimeout(() => {
-            copyMessage.classList.add('hidden');
-        }, 2000);
-    }
+        if (isNaN(numUsers) || numUsers < 1) {
+            alert('Please enter a valid number of users to generate the report.');
+            return;
+        }
 
+        const planData = pricingData[planType].yearly;
+        const benefitsData = planBenefits[planType];
+        
+        // Calculations
+        const basePrice = planData.base;
+        const firstYearDiscountAmount = planData.discount;
+        const firstYearDiscountPercent = Math.abs((firstYearDiscountAmount / basePrice) * 100);
+        const totalBasePrice = numUsers * basePrice;
+        const totalFirstYearDiscount = numUsers * firstYearDiscountAmount;
+        const taxableAmountFirstYear = totalBasePrice + totalFirstYearDiscount;
+        const gstAmountFirstYear = taxableAmountFirstYear * 0.18;
+        const totalFirstYearCost = taxableAmountFirstYear + gstAmountFirstYear;
+
+        const taxableAmountRenewal = totalBasePrice;
+        const gstAmountRenewal = taxableAmountRenewal * 0.18;
+        const totalRenewalCost = taxableAmountRenewal + gstAmountRenewal;
+
+        const reportContent = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Odoo Pricing Report - ${benefitsData.title}</title>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+                <style>
+                    body {
+                        font-family: 'Inter', sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        background-color: #f7f9fc;
+                        padding: 40px;
+                        margin: 0;
+                        -webkit-print-color-adjust: exact;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: auto;
+                        padding: 30px;
+                        background-color: #ffffff;
+                        border-radius: 12px;
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 2rem;
+                    }
+                    .header h1 {
+                        font-size: 2rem;
+                        font-weight: 800;
+                        color: #2c3e50;
+                        margin: 0;
+                    }
+                    .header p {
+                        font-size: 1.1rem;
+                        color: #7f8c8d;
+                        margin: 0.5rem 0 0;
+                    }
+                    .section {
+                        margin-bottom: 2.5rem;
+                        border-bottom: 2px solid #e0e6ed;
+                        padding-bottom: 1.5rem;
+                    }
+                    .section-title {
+                        font-size: 1.6rem;
+                        font-weight: 700;
+                        color: #34495e;
+                        margin-bottom: 1rem;
+                        text-align: center;
+                    }
+                    .plan-title {
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                        color: #3498db;
+                        margin-bottom: 10px;
+                    }
+                    .benefits-list {
+                        font-size: 0.9rem;
+                        list-style: none;
+                        padding: 0;
+                        margin-bottom: 1.5rem;
+                        color: #555;
+                    }
+                    .benefits-list-title {
+                        font-weight: 600;
+                        margin-bottom: 5px;
+                    }
+                    .pricing-list {
+                        padding: 0;
+                        margin: 0;
+                        list-style: none;
+                    }
+                    .pricing-line {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 12px 0;
+                        border-bottom: 1px dashed #dce1e6;
+                        font-size: 1rem;
+                    }
+                    .pricing-line:last-child {
+                        border-bottom: none;
+                    }
+                    .pricing-line span:first-child {
+                        color: #555;
+                    }
+                    .pricing-line span:last-child {
+                        font-weight: 600;
+                        color: #1a1a1a;
+                    }
+                    .total-price {
+                        font-weight: 800;
+                        font-size: 1.3rem;
+                        color: #27ae60;
+                        margin-top: 20px;
+                        padding-top: 15px;
+                        border-top: 2px solid #2ecc71;
+                        text-align: right;
+                    }
+                    .note {
+                        font-size: 0.9rem;
+                        color: #95a5a6;
+                        text-align: center;
+                        margin-top: 3rem;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>${benefitsData.icon} Odoo ${benefitsData.title}</h1>
+                        <p>Cost Analysis for ${numUsers} Users</p>
+                    </div>
+
+                    <div class="section">
+                        <h2 class="section-title">First-Year Pricing (on First Order only)</h2>
+                        <ul class="benefits-list">
+                            <li class="benefits-list-title">Benefits:</li>
+                            ${benefitsData.benefits.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                        <div class="pricing-list">
+                            <div class="pricing-line"><span>Base Rate Per User/Year</span><span>${formatCurrency(basePrice)}</span></div>
+                            <div class="pricing-line"><span>Base Price (${numUsers} Users)</span><span>${formatCurrency(totalBasePrice)}</span></div>
+                            <div class="pricing-line"><span>Discount (${firstYearDiscountPercent.toFixed(1)}%)</span><span>${formatCurrency(totalFirstYearDiscount)}</span></div>
+                            <div class="pricing-line"><span>Taxable Amount</span><span>${formatCurrency(taxableAmountFirstYear)}</span></div>
+                            <div class="pricing-line"><span>GST (18%)</span><span>${formatCurrency(gstAmountFirstYear)}</span></div>
+                            <div class="pricing-line total-price"><span>Total First-Year Cost</span><span>${formatCurrency(totalFirstYearCost)}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2 class="section-title">Renewal Pricing</h2>
+                        <div class="pricing-list">
+                            <div class="pricing-line"><span>Base Rate Per User/Year</span><span>${formatCurrency(basePrice)}</span></div>
+                            <div class="pricing-line"><span>Base Price (${numUsers} Users)</span><span>${formatCurrency(totalBasePrice)}</span></div>
+                            <div class="pricing-line"><span>Discount (0%)</span><span>${formatCurrency(0.00)}</span></div>
+                            <div class="pricing-line"><span>Taxable Amount</span><span>${formatCurrency(taxableAmountRenewal)}</span></div>
+                            <div class="pricing-line"><span>GST (18%)</span><span>${formatCurrency(gstAmountRenewal)}</span></div>
+                            <div class="pricing-line total-price"><span>Total Renewal Cost</span><span>${formatCurrency(totalRenewalCost)}</span></div>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const newWindow = window.open('', '_blank');
+        newWindow.document.write(reportContent);
+        newWindow.document.close();
+    }
+    
     // Event listeners
     numUsersInput.addEventListener('input', () => {
         updateCalculator();
@@ -1113,18 +1305,32 @@
         updateComparisonModal();
     });
     
-    modalCloseBtn.addEventListener('click', () => {
-        compareModal.style.display = 'none';
+    allModalCloseBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            allModals.forEach(modal => modal.style.display = 'none');
+        });
     });
     
     window.addEventListener('click', (event) => {
-        if (event.target === compareModal) {
-            compareModal.style.display = 'none';
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
         }
     });
     
-    // Copy to clipboard event listener
-    copyBtn.addEventListener('click', copyPricingSummary);
+    // Print analysis event listener from modal
+    printAnalysisBtnModal.addEventListener('click', () => {
+        printModal.style.display = 'block';
+    });
+    
+    printStandardBtn.addEventListener('click', () => {
+        generateAndPrintReport('standard');
+        printModal.style.display = 'none';
+    });
+
+    printCustomBtn.addEventListener('click', () => {
+        generateAndPrintReport('custom');
+        printModal.style.display = 'none';
+    });
 
     // Initialize
     window.addEventListener('load', () => {
