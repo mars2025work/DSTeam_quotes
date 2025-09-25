@@ -1,5 +1,5 @@
 No More Boring Excel sheet or Head Scratches !
-Turn Pricing Talks into Clarity, Not Chaos 😊
+Turn Pricing Talks into Clarity, Not Chaos !!
 
 This page has been created with one main goal: to make price discussions easier, faster, and more accurate. For a long time, we have relied on spreadsheets for calculations. While they are useful, they can also be slow, feel outdated, and sometimes confusing—especially during client meetings, when clarity is most important.
 
