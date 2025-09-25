@@ -517,8 +517,8 @@
     <!-- Contact Footer -->
     <footer class="contact-card rounded-2xl p-5 md:p-6 text-center">
         <div class="mb-5">
-            <h3 class="text-2xl sm:text-3xl font-bold mb-2">🎯 Do You Have Any Cool Idea For This Project?</h3>
-            <p class="text-base sm:text-xl text-gray-700">Connect with Me On Discord </p>
+            <h3 class="text-2xl sm:text-3xl font-bold mb-2">🎯 Do You Have Cool Idea For this Project?</h3>
+            <p class="text-base sm:text-xl text-gray-700">Connect With Me on Discord</p>
         </div>
         
         <div class="bg-white/10 rounded-xl p-5 max-w-sm mx-auto">
@@ -528,7 +528,6 @@
                    class="flex items-center justify-center gap-2 bg-white/20 rounded-lg p-2 hover:bg-white/30 transition-all">
                     <span class="text-lg">📧</span>
                     <span class="font-semibold">atsh@odoo.com</span>
-                </a>
             </div>
         </div>
     </footer>
@@ -539,7 +538,7 @@
     <div class="modal-content p-4 md:p-6">
         <span class="modal-close">&times;</span>
         <h2 class="text-3xl sm:text-4xl font-black text-gray-800 text-center mb-6">
-            Plan Comparison
+            Odoo Plan Comparison Table
         </h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -739,19 +738,40 @@
             title: "Standard Plan",
             icon: "✨",
             benefits: [
-                "Access to all apps( Except Odoo Studio and Automation)",
-                "Hosting: Odoo Online only"
+                {
+                    text: "Access to all apps( Except Odoo Studio and Automation)",
+                    note: "Gain full access to all essential Odoo apps to manage your business operations."
+                },
+                {
+                    text: "Hosting: Odoo Online only",
+                    note: "Enjoy hassle-free hosting on Odoo's cloud platform, with no setup required."
+                }
             ]
         },
         custom: {
             title: "Custom Plan",
             icon: "🚀",
             benefits: [
-                "All apps",
-                "Odoo Online / Odoo.sh / On-premise",
-                "Odoo Studio",
-                "Multi-Company",
-                "External API"
+                {
+                    text: "All apps",
+                    note: "A comprehensive solution with all Odoo apps available from the start."
+                },
+                {
+                    text: "Odoo Online / Odoo.sh / On-premise",
+                    note: "Choose your preferred hosting environment: cloud, dedicated cloud, or on-site."
+                },
+                {
+                    text: "Odoo Studio",
+                    note: "Customize your Odoo apps with a user-friendly drag-and-drop interface."
+                },
+                {
+                    text: "Multi-Company",
+                    note: "Manage multiple companies with a single Odoo database."
+                },
+                {
+                    text: "External API",
+                    note: "Integrate Odoo with other business applications and services."
+                }
             ]
         }
     };
@@ -1098,142 +1118,214 @@
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Odoo Pricing Report - ${benefitsData.title}</title>
-                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+                <title>Odoo Pricing Analysis</title>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
                 <style>
                     body {
                         font-family: 'Inter', sans-serif;
-                        line-height: 1.6;
                         color: #333;
-                        background-color: #f7f9fc;
-                        padding: 40px;
+                        line-height: 1.6;
                         margin: 0;
+                        padding: 0;
+                        background-color: #f4f7f9;
                         -webkit-print-color-adjust: exact;
                     }
-                    .container {
-                        max-width: 600px;
-                        margin: auto;
-                        padding: 30px;
-                        background-color: #ffffff;
-                        border-radius: 12px;
-                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+                    .report-container {
+                        width: 210mm;
+                        min-height: 297mm;
+                        margin: 0 auto;
+                        padding: 20mm;
+                        background: #fff;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
                     }
                     .header {
-                        text-align: center;
-                        margin-bottom: 2rem;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start; /* Align to the top */
+                        padding-bottom: 20px;
+                        margin-bottom: 30px;
+                    }
+                    .header img {
+                        height: 20px; /* Reduced logo size */
+                        margin-left: auto; /* Push logo to the right */
                     }
                     .header h1 {
-                        font-size: 2rem;
+                        font-size: 28px;
                         font-weight: 800;
-                        color: #2c3e50;
+                        color: #0A84FF;
                         margin: 0;
                     }
-                    .header p {
-                        font-size: 1.1rem;
-                        color: #7f8c8d;
-                        margin: 0.5rem 0 0;
-                    }
-                    .section {
-                        margin-bottom: 2.5rem;
-                        border-bottom: 2px solid #e0e6ed;
-                        padding-bottom: 1.5rem;
-                    }
-                    .section-title {
-                        font-size: 1.6rem;
-                        font-weight: 700;
-                        color: #34495e;
-                        margin-bottom: 1rem;
+                    .plan-header {
                         text-align: center;
+                        margin-bottom: 30px;
                     }
-                    .plan-title {
-                        font-size: 1.5rem;
+                    .plan-header h2 {
+                        font-size: 24px;
                         font-weight: 700;
-                        color: #3498db;
+                        color: #333;
+                        margin: 0;
+                    }
+                    .plan-header p {
+                        font-size: 16px;
+                        color: #777;
+                        margin: 5px 0 0;
+                    }
+                    .benefits {
+                        margin-bottom: 30px;
+                    }
+                    .benefits-title {
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #555;
                         margin-bottom: 10px;
                     }
                     .benefits-list {
-                        font-size: 0.9rem;
                         list-style: none;
-                        padding: 0;
-                        margin-bottom: 1.5rem;
-                        color: #555;
-                    }
-                    .benefits-list-title {
-                        font-weight: 600;
-                        margin-bottom: 5px;
-                    }
-                    .pricing-list {
                         padding: 0;
                         margin: 0;
-                        list-style: none;
-                    }
-                    .pricing-line {
-                        display: flex;
-                        justify-content: space-between;
-                        padding: 12px 0;
-                        border-bottom: 1px dashed #dce1e6;
-                        font-size: 1rem;
-                    }
-                    .pricing-line:last-child {
-                        border-bottom: none;
-                    }
-                    .pricing-line span:first-child {
+                        font-size: 14px;
                         color: #555;
                     }
-                    .pricing-line span:last-child {
-                        font-weight: 600;
-                        color: #1a1a1a;
+                    .benefits-list li {
+                        margin-bottom: 5px;
                     }
-                    .total-price {
-                        font-weight: 800;
-                        font-size: 1.3rem;
-                        color: #27ae60;
-                        margin-top: 20px;
-                        padding-top: 15px;
-                        border-top: 2px solid #2ecc71;
+                    .benefits-list li::before {
+                        content: '✓';
+                        color: #10b981;
+                        font-weight: bold;
+                        display: inline-block;
+                        width: 1.2em;
+                        margin-left: -1.2em;
+                    }
+                    .pricing-section {
+                        margin-bottom: 30px;
+                    }
+                    .pricing-section h3 {
+                        font-size: 18px;
+                        font-weight: 700;
+                        color: #0A84FF;
+                        margin-bottom: 15px;
+                        border-bottom: 1px solid #ddd;
+                        padding-bottom: 5px;
+                    }
+                    .pricing-table {
+                        width: 100%;
+                        font-size: 14px;
+                        line-height: 1.8;
+                    }
+                    .pricing-table .row {
+                        display: flex;
+                        justify-content: space-between;
+                        border-bottom: 1px dashed #ddd;
+                        padding: 5px 0;
+                    }
+                    .pricing-table .row:last-child {
+                        border-bottom: none;
+                    }
+                    .pricing-table .label {
+                        text-align: left;
+                    }
+                    .pricing-table .value {
                         text-align: right;
+                        font-weight: 600;
                     }
-                    .note {
-                        font-size: 0.9rem;
-                        color: #95a5a6;
-                        text-align: center;
-                        margin-top: 3rem;
+                    .pricing-table .total-row {
+                        font-size: 16px;
+                        font-weight: 800;
+                        color: #10b981;
+                        border-top: 2px solid #10b981;
+                        padding-top: 10px;
+                        margin-top: 10px;
+                    }
+                    .footer {
+                        font-size: 12px;
+                        color: #888;
+                        margin-top: 50px;
+                        padding-top: 20px;
+                        border-top: 1px solid #eee;
+                    }
+                    .footer p {
+                        margin: 0 0 10px 0;
                     }
                 </style>
             </head>
             <body>
-                <div class="container">
-                    <div class="header">
-                        <h1>${benefitsData.icon} Odoo ${benefitsData.title}</h1>
+                <div class="report-container">
+                    <header class="header">
+                        <h1>Odoo Pricing Analysis</h1>
+                        <img src="https://www.odoo.com/web/image/res.company/1/logo?unique=7302f3c" alt="Odoo Logo">
+                    </header>
+                    <div class="plan-header">
+                        <h2>${benefitsData.icon} Odoo ${benefitsData.title}</h2>
                         <p>Cost Analysis for ${numUsers} Users</p>
                     </div>
-
-                    <div class="section">
-                        <h2 class="section-title">First-Year Pricing (on First Order only)</h2>
+                    <div class="benefits">
+                        <div class="benefits-title">Key Benefits:</div>
                         <ul class="benefits-list">
-                            <li class="benefits-list-title">Benefits:</li>
-                            ${benefitsData.benefits.map(item => `<li>${item}</li>`).join('')}
+                            ${benefitsData.benefits.map(item => `<li>${item.text}<br><span style="font-size: 0.9em; color: #888;">${item.note}</span></li>`).join('')}
                         </ul>
-                        <div class="pricing-list">
-                            <div class="pricing-line"><span>Base Rate Per User/Year</span><span>${formatCurrency(basePrice)}</span></div>
-                            <div class="pricing-line"><span>Base Price (${numUsers} Users)</span><span>${formatCurrency(totalBasePrice)}</span></div>
-                            <div class="pricing-line"><span>Discount (${firstYearDiscountPercent.toFixed(1)}%)</span><span>${formatCurrency(totalFirstYearDiscount)}</span></div>
-                            <div class="pricing-line"><span>Taxable Amount</span><span>${formatCurrency(taxableAmountFirstYear)}</span></div>
-                            <div class="pricing-line"><span>GST (18%)</span><span>${formatCurrency(gstAmountFirstYear)}</span></div>
-                            <div class="pricing-line total-price"><span>Total First-Year Cost</span><span>${formatCurrency(totalFirstYearCost)}</span></div>
+                    </div>
+                    <div class="pricing-section">
+                        <h3>First-Year Pricing (on First Order only)</h3>
+                        <div class="pricing-table">
+                            <div class="row">
+                                <span class="label">Base Rate Per User/Year</span>
+                                <span class="value">${formatCurrency(basePrice)}</span>
+                            </div>
+                            <div class="row">
+                                <span class="label">Base Price (${numUsers} Users)</span>
+                                <span class="value">${formatCurrency(totalBasePrice)}</span>
+                            </div>
+                            <div class="row">
+                                <span class="label">Discount (${firstYearDiscountPercent.toFixed(2)}%)</span>
+                                <span class="value">${formatCurrency(totalFirstYearDiscount)}</span>
+                            </div>
+                            <div class="row">
+                                <span class="label">Taxable Amount</span>
+                                <span class="value">${formatCurrency(taxableAmountFirstYear)}</span>
+                            </div>
+                            <div class="row">
+                                <span class="label">GST (18%)</span>
+                                <span class="value">${formatCurrency(gstAmountFirstYear)}</span>
+                            </div>
+                            <div class="row total-row">
+                                <span class="label">Total First-Year Cost</span>
+                                <span class="value">${formatCurrency(totalFirstYearCost)}</span>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="section">
-                        <h2 class="section-title">Renewal Pricing</h2>
-                        <div class="pricing-list">
-                            <div class="pricing-line"><span>Base Rate Per User/Year</span><span>${formatCurrency(basePrice)}</span></div>
-                            <div class="pricing-line"><span>Base Price (${numUsers} Users)</span><span>${formatCurrency(totalBasePrice)}</span></div>
-                            <div class="pricing-line"><span>Discount (0%)</span><span>${formatCurrency(0.00)}</span></div>
-                            <div class="pricing-line"><span>Taxable Amount</span><span>${formatCurrency(taxableAmountRenewal)}</span></div>
-                            <div class="pricing-line"><span>GST (18%)</span><span>${formatCurrency(gstAmountRenewal)}</span></div>
-                            <div class="pricing-line total-price"><span>Total Renewal Cost</span><span>${formatCurrency(totalRenewalCost)}</span></div>
+                    <div class="pricing-section">
+                        <h3>Renewal Pricing</h3>
+                        <div class="pricing-table">
+                            <div class="row">
+                                <span class="label">Base Rate Per User/Year</span>
+                                <span class="value">${formatCurrency(basePrice)}</span>
+                            </div>
+                            <div class="row">
+                                <span class="label">Base Price (${numUsers} Users)</span>
+                                <span class="value">${formatCurrency(totalBasePrice)}</span>
+                            </div>
+                            <div class="row">
+                                <span class="label">Discount (0.00%)</span>
+                                <span class="value">${formatCurrency(0)}</span>
+                            </div>
+                            <div class="row">
+                                <span class="label">Taxable Amount</span>
+                                <span class="value">${formatCurrency(taxableAmountRenewal)}</span>
+                            </div>
+                            <div class="row">
+                                <span class="label">GST (18%)</span>
+                                <span class="value">${formatCurrency(gstAmountRenewal)}</span>
+                            </div>
+                            <div class="row total-row">
+                                <span class="label">Total Renewal Cost</span>
+                                <span class="value">${formatCurrency(totalRenewalCost)}</span>
+                            </div>
                         </div>
+                    </div>
+                    <div class="footer">
+                        <p>This proposal is related to the "Odoo Enterprise Subscription Agreement" available on <a href="https://www.odoo.com/r/enterprise-contract">https://www.odoo.com/r/enterprise-contract</a>.
+                        <p>Note: Minor customizations are done through Odoo Studio, included in the custom plan. But major developments, like Python modules, might require an Odoo.sh cloud subscription. For more information, connect with your Account Manager.</p>
                     </div>
                 </div>
             </body>
