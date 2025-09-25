@@ -528,6 +528,7 @@
                    class="flex items-center justify-center gap-2 bg-white/20 rounded-lg p-2 hover:bg-white/30 transition-all">
                     <span class="text-lg">📧</span>
                     <span class="font-semibold">atsh@odoo.com</span>
+                </a>
             </div>
         </div>
     </footer>
@@ -1091,6 +1092,8 @@
     function generateAndPrintReport(planType) {
         const numUsers = parseInt(numUsersInput.value, 10);
         if (isNaN(numUsers) || numUsers < 1) {
+            // Using a custom modal instead of alert for better user experience
+            // This is a placeholder for a more advanced message box implementation
             alert('Please enter a valid number of users to generate the report.');
             return;
         }
@@ -1141,19 +1144,21 @@
                     .header {
                         display: flex;
                         justify-content: space-between;
-                        align-items: flex-start; /* Align to the top */
+                        align-items: center;
                         padding-bottom: 20px;
                         margin-bottom: 30px;
-                    }
-                    .header img {
-                        height: 20px; /* Reduced logo size */
-                        margin-left: auto; /* Push logo to the right */
+                        border-bottom: 2px solid #ddd;
                     }
                     .header h1 {
                         font-size: 28px;
                         font-weight: 800;
                         color: #0A84FF;
                         margin: 0;
+                    }
+                    .header img {
+                        height: 60px;
+                        width: auto;
+                        margin-left: 20px;
                     }
                     .plan-header {
                         text-align: center;
@@ -1434,3 +1439,4 @@
 
 </body>
 </html>
+
