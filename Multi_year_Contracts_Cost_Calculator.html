@@ -52,7 +52,7 @@
     <title>Odoo Multi-Years Contract Pricing Comparison</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -66,6 +66,9 @@
             --apple-purple: #9b51e0;
             --apple-pink: #ec4899;
             --apple-gradient: linear-gradient(135deg, #007aff, #9b51e0);
+            --odoo-purple: #714B67; /* Odoo dark color for emphasis */
+            --odoo-light: #F7F4F9; /* Odoo light background for tables */
+            --ios-gray-border: #e8e8ed;
         }
 
         body {
@@ -81,11 +84,6 @@
             border-radius: 1.5rem;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.6);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .main-container:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
         }
 
         .tab-toggle-group {
@@ -128,24 +126,6 @@
             box-shadow: 0 6px 18px rgba(0, 122, 255, 0.4);
             transform: translateY(-2px);
         }
-        .contract-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            border-radius: 1.2rem;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
-        }
 
         .highlight {
             background: var(--apple-gradient);
@@ -153,75 +133,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .number-input {
-            background: var(--light-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 9999px;
-            padding: 0.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            color: var(--primary-text);
-        }
-
-        .number-input:focus {
-            outline: none;
-            border-color: var(--apple-blue);
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
-        }
-        
-        .section-header {
-            background: var(--apple-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .chart-container {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(8px);
-            border-radius: 1.2rem;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-        }
-
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            background-color: #333;
-            color: #fff;
-            text-align: left;
-            border-radius: 6px;
-            padding: 5px 10px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            width: 200px;
-            line-height: 1.4;
-        }
-
-        .tooltip .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #333 transparent transparent transparent;
-        }
-
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-        
         .info-icon {
             animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
             background: var(--apple-gradient);
@@ -246,77 +157,165 @@
             color: white;
             font-weight: 600;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
             border: none;
             cursor: pointer;
             z-index: 1000;
-        }
-        .print-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-        }
-        .print-btn:active {
-            transform: translateY(0);
         }
 
         .print-report {
             display: none;
         }
 
+        /* --- PRINT STYLES (PDF Reference Aesthetic) --- */
         @media print {
             body {
-                background: none;
-                -webkit-print-color-adjust: exact;
-                color-adjust: exact;
-                width: 210mm;
-                height: 297mm;
-                margin: 0;
-                padding: 0;
-            }
-            
-            /* Hide all interactive elements during print */
-            .main-container,
-            .print-btn,
-            .nav-container,
-            .nav-btn,
-            .tab-toggle-group,
-            .tab-toggle-btn,
-            .contract-btn,
-            button,
-            input,
-            .tooltip,
-            .info-icon,
-            canvas {
-                display: none !important;
-            }
-            
-            .print-report {
-                display: block !important;
-                box-shadow: none;
-                border: none;
-                background: none;
-            }
-            
-            .print-report h1, .print-report h2, .print-report p, .print-report span, .print-report li {
-                color: #000 !important;
-                -webkit-text-fill-color: #000 !important;
-            }
-            
-            .print-report .highlight {
-                -webkit-text-fill-color: var(--apple-blue) !important;
-                color: var(--apple-blue) !important;
-            }
-            
-            /* Ensure proper page layout for print */
-            .print-report * {
+                background: white;
                 -webkit-print-color-adjust: exact !important;
                 color-adjust: exact !important;
+                width: 210mm; 
+                height: 297mm; /* Ensure A4 height constraint */
+                margin: 0;
+                padding: 0;
+                font-size: 9.5pt; /* Smaller font for A4 fit */
+                font-family: 'Inter', sans-serif;
+                color: #333;
+            }
+            .main-container, .print-btn, .tooltip, .info-icon {
+                display: none !important;
+            }
+            .print-report {
+                display: block;
+                padding: 30px; 
+                position: relative;
+                box-sizing: border-box; 
+                height: 297mm;
+                overflow: hidden; /* Prevent extra pages */
+            }
+            
+            /* HEADER STYLES */
+            .print-logo-container {
+                position: absolute;
+                top: 30px;
+                right: 30px;
+                width: 100px; /* Space for logo */
+                height: 35px;
+            }
+            .print-logo-container img {
+                height: 35px; 
+                width: auto;
+            }
+
+            .print-header {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 1.5rem;
+            }
+            
+            .print-title {
+                margin-bottom: 0.5rem;
+            }
+
+            .print-title h1 {
+                font-size: 1.8rem;
+                font-weight: 800;
+                color: var(--odoo-purple);
+                margin-bottom: 0;
+            }
+            .print-title p {
+                font-size: 0.9rem;
+                color: #666;
+                font-weight: 600;
+            }
+
+            /* BODY SECTIONS (Matching PDF Structure) */
+            .print-body {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 25px; /* Spacing between columns */
+            }
+
+            .print-data-table {
+                width: 100%;
+                margin-bottom: 1.5rem;
+                border: none;
+            }
+            
+            .print-data-table h2 {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--primary-text);
+                margin-bottom: 0.5rem;
+                padding-bottom: 0.25rem;
+                border-bottom: 1px solid var(--ios-gray-border);
+            }
+            
+            .print-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .print-table tr {
+                border-bottom: 1px solid #ddd;
+            }
+            .print-table tr:last-child {
+                border-bottom: none;
+            }
+
+            .print-table td {
+                padding: 5px 0;
+                font-size: 9.5pt;
+            }
+
+            .print-table .label {
+                text-align: left;
+                font-weight: 400;
+                color: #444;
+                width: 70%;
+            }
+
+            .print-table .value {
+                text-align: right;
+                font-weight: 600;
+                color: var(--primary-text);
+                width: 30%;
+            }
+
+            .print-table .total-row td {
+                font-weight: 700;
+                background-color: var(--odoo-light);
+                border-top: 1px solid #aaa;
+                padding: 8px 0;
+            }
+            
+            .print-table .savings-row .value {
+                color: #10b981; /* Green for savings */
+                font-size: 10.5pt;
+                font-weight: 800;
+            }
+
+            /* FOOTER STYLES */
+            .print-footer {
+                position: absolute;
+                bottom: 30px;
+                left: 30px;
+                right: 30px;
+                padding-top: 10px;
+                border-top: 1px solid #ddd;
+            }
+            .print-footer p {
+                font-size: 8pt;
+                color: #666;
+                line-height: 1.4;
+                margin-bottom: 5px;
             }
         }
     </style>
 </head>
 <body class="p-6 md:p-10">
+    <!-- Print Button (Visible in Browser, Hidden in Print) -->
     <button id="print-btn" class="print-btn">Print Your Report</button>
+
+    <!-- Main Calculator UI (Visible in Browser, Hidden in Print) -->
     <div class="max-w-7xl mx-auto p-8 main-container">
         <header class="text-center mb-12">
             <h1 class="text-4xl md:text-6xl font-bold section-header mb-3">Odoo Multi Year Contracts</h1>
@@ -380,7 +379,10 @@
             </div>
         </div>
     </div>
+    
+    <!-- Print Report Container (Hidden in Browser, Visible in Print) -->
     <div id="print-report-container"></div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const standardPlan = {
@@ -544,7 +546,7 @@
                         <span class="tooltip ml-2 cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="info-icon" viewBox="0 0 16 16">
                                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                <path d="M8.93 6.588l.276-.276a.35.35 0 0 0-.464-.547c-.43.272-.943.513-1.465.753-.522.24-.87.525-1.07.828-.21.314-.265.656-.265 1.05a1.04 1.04 0 0 0 .194.611c.143.195.342.339.638.455.297.116.634.195 1.008.237a.35.35 0 0 0 .34-.467c-.126-.2-.31-.295-.582-.412-.272-.117-.468-.247-.59-.408-.12-.15-.18-.31-.18-.466 0-.323.23-.497.523-.623.292-.126.685-.188-1.18-.218.495-.03.888-.042 1.258-.042.35 0 .685.012.92.036.236.024.42.06.55.107.13.047.228.106.29.177.062.071.1.157.1.252 0 .142-.08.275-.25.405l-.265.233a.35.35 0 0 0-.466.547c.43-.272.943-.513 1.465-.753.522-.24.87-.525 1.07-.828.21-.314.265-.656.265-1.05a1.04 1.04 0 0 0-.194-.611c-.143-.195-.342-.339-.638-.455-.297-.116-.634-.195-1.008-.237a.35.35 0 0 0-.34.467c.126.2.31.295.582.412.272.117.468.247.59.408.12.15.18.31.18.466 0 .323-.23.497-.523.623-.292.126-.685-.188-1.18-.218z"/>
+                                <path d="M8.93 6.588l.276-.276a.35.35 0 0 0-.464-.547c-.43.272-.943.513-1.465.753-.522.24-.87.525-1.07.828-.21.314-.265.656-.265 1.05a1.04 1.04 0 0 0 .194.611c.143.195.342.339.638.455.297.116.634.195 1.008.237a.35.35 0 0 0 .34-.467c-.126-.2-.31-.295-.582-.412-.272-.117-.468-.247-.59-.408-.12-.15-.18-.31-.18-.466 0-.323.23-.497.523-.623.292-.126.685-.188-1.18-.218.495-.03.888-.042 1.258-.042.35 0 .685.012.92.036.236.024.42.06.55.107.13.047.228.106.29.177.062.071.1.157.1.252 0 .142-.08.275-.25.405l-.265.233a.35.35 0 0 0-.466.547c.43-.272.943-.513 1.465-.753.522-.24.87-.525 1.07-.828.21-.314.265-.656.265-1.05a1.04 1.04 0 0 0-.194-.611c-.143-.195-.342-.339-.638-.455-.297-.116-.634-.195-1.008-.237a.35.35 0 0 0-.34.467c.126.2.31.295.582.412.272.117.468.247.59.408-.12.15-.18.31-.18.466 0-.323.23-.497.523-.623.292-.126.685-.188-1.18-.218z"/>
                             </svg>
                             <span class="tooltiptext">
                                 Base Price for ${users} users for ${years} years:<br>
@@ -866,78 +868,171 @@
                 updateCharts(currentPlan, users);
             };
 
+            const getDurationName = (duration) => {
+                const yearMap = {
+                    '1year': '1-Year',
+                    '2year': '2-Year',
+                    '3year': '3-Year',
+                    '4year': '4-Year',
+                    '5year': '5-Year'
+                };
+                return yearMap[duration] || 'Multi-Year';
+            };
+
             const generatePrintReport = (planType, contractDuration, users) => {
                 const data = planType === 'standard' ? calculateStandard(users) : calculateCustom(users);
                 const basePricePerUser = planType === 'standard' ? standardPlan.basePrice : customPlan.basePrice;
                 const years = parseInt(contractDuration.replace('year', ''));
-                const basePriceTotal = basePricePerUser * users * years;
                 const planName = planType.charAt(0).toUpperCase() + planType.slice(1);
-                
-                const getBreakdownHtml = () => {
-                    if (years === 1) {
-                        return `
-                            <li>Year 1 (${planType === 'standard' ? `${(standardPlan.discounts.year1 * 100).toFixed(0)}%` : `${customPlan.discounts.year1_percent.toFixed(2)}%`} discount): <span style="font-weight: bold;">${formatCurrency(data.price1Y)}</span></li>
-                        `;
-                    }
-                    const discountRate = planType === 'standard' ? standardPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`] : customPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`];
-                    return `
-                        <li>Year 1 Discounted Price: <span style="font-weight: bold;">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2-${years} (${(discountRate * 100).toFixed(2)}% discount): <span style="font-weight: bold;">${formatCurrency(data[`price${years}Y`] - data.year1Discounted)}</span></li>
-                    `;
-                };
+                const durationName = getDurationName(contractDuration);
 
-                const getNonContractPrice = () => {
-                    if (years === 1) return data.price1Y_final;
-                    return data[`nonContract${years}Y_final`];
-                };
+                // Calculations for the new print format
+                const firstYearTaxable = data.year1Discounted;
+                const firstYearGST = firstYearTaxable * GST_RATE;
+                const firstYearTotal = firstYearTaxable + firstYearGST;
+                const year1DiscountPercentage = planType === 'standard' ? (standardPlan.discounts.year1 * 100) : customPlan.discounts.year1_percent;
+                const year1DiscountAmount = planType === 'standard' ? (basePricePerUser * users * standardPlan.discounts.year1) : (customPlan.discounts.year1_amount * users);
+
+                let renewalSectionHtml = '';
+                let renewalYears = years > 1 ? years - 1 : 0;
+
+                // Generate renewal section for contracts longer than 1 year
+                if (renewalYears > 0) {
+                    const contractPriceUntaxed = data[`price${years}Y`] || data.price1Y;
+                    const contractRenewalPriceUntaxed = contractPriceUntaxed - firstYearTaxable;
+                    const contractRenewalPrice = contractRenewalPriceUntaxed * (1 + GST_RATE);
+                    
+                    const renewalDiscountRate = planType === 'standard' 
+                        ? standardPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`] 
+                        : customPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`];
+                    
+                    renewalSectionHtml = `
+                        <div class="print-data-table">
+                            <h2>Renewal Pricing (${renewalYears} Years)</h2>
+                            <table class="print-table">
+                                <tr>
+                                    <td class="label">Base Rate Per User/Year</td>
+                                    <td class="value">${formatCurrency(basePricePerUser)}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Total Base Price (${users} Users, ${renewalYears} Years)</td>
+                                    <td class="value">${formatCurrency(basePricePerUser * users * renewalYears)}</td>
+                                </tr>
+                                 <tr>
+                                    <td class="label">Renewal Discount (${(renewalDiscountRate * 100).toFixed(2)}%)</td>
+                                    <td class="value">${formatCurrency(basePricePerUser * users * renewalYears * renewalDiscountRate)}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Taxable Amount</td>
+                                    <td class="value">${formatCurrency(contractRenewalPriceUntaxed)}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">GST (${(GST_RATE * 100).toFixed(0)}%)</td>
+                                    <td class="value">${formatCurrency(contractRenewalPrice - contractRenewalPriceUntaxed)}</td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td class="label">Total Renewal Cost (inc. GST)</td>
+                                    <td class="value">${formatCurrency(contractRenewalPrice)}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    `;
+                }
+                
+                const contractPriceFinal = data[`price${years}Y_final`];
+                const contractPriceUntaxed = contractPriceFinal / (1 + GST_RATE);
+                
+                const nonContractPriceFinal = data[`nonContract${years}Y_final`];
+                const nonContractPriceUntaxed = nonContractPriceFinal / (1 + GST_RATE);
+                
+                const totalSavings = data[`savings${years}Y`] || 0;
+                const totalSavingsPercent = data[`savingsPercent${years}Y`] || 0;
+                
+                // Calculate Average Cost Per User Per Year (Untaxed)
+                const avgContractCostPerUserPerYear = contractPriceUntaxed / users / years;
+                const avgNonContractCostPerUserPerYear = nonContractPriceUntaxed / users / years;
+
 
                 const reportHtml = `
-                    <div class="print-report p-6 md:p-10" style="font-family: 'Inter', sans-serif;">
-                        <h1 style="font-size: 2.5rem; font-weight: bold; text-align: center; margin-bottom: 2rem;">Odoo Multi Year Contracts Report</h1>
-                        <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 2rem;">
-                            <div>
-                                <h3 style="font-size: 1.25rem; font-weight: 600;">Chosen Plan Name:</h3>
-                                <p style="font-size: 1.5rem; font-weight: bold; color: #007aff;">${planName}</p>
-                            </div>
-                            <div>
-                                <h3 style="font-size: 1.25rem; font-weight: 600;">Number of Users:</h3>
-                                <p style="font-size: 1.5rem; font-weight: bold; color: #007aff;">${users}</p>
-                            </div>
-                            <div>
-                                <h3 style="font-size: 1.25rem; font-weight: 600;">Selected Duration:</h3>
-                                <p style="font-size: 1.5rem; font-weight: bold; color: #007aff;">${years} Years</p>
-                            </div>
-                            <div>
-                                <h3 style="font-size: 1.25rem; font-weight: 600;">Base Price per User per Year:</h3>
-                                <p style="font-size: 1.5rem; font-weight: bold; color: #007aff;">${formatCurrency(basePricePerUser)}</p>
+                    <div class="print-report">
+                        <div class="print-logo-container">
+                            <img src="https://www.odoo.com/assets/3.0/img/odoo_logo_wordmark_positive.svg" alt="Odoo Logo">
+                        </div>
+                        <div class="print-header">
+                            <div class="print-title">
+                                <h1>Odoo Pricing Analysis</h1>
+                                <p>${durationName} Odoo ${planName} Plan | Cost Analysis for ${users} Users</p>
                             </div>
                         </div>
                         
-                        <div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e5e7eb; margin-top: 1rem; margin-bottom: 2rem; text-align: center;">
-                            <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem;">Total Price and Breakdown</h2>
-                            <p style="font-size: 2.5rem; font-weight: bold; color: #9b51e0; margin-bottom: 0.5rem;">${formatCurrency(data[`price${years}Y_final`])}</p>
-                            <p style="font-size: 1rem; color: #6b7280; margin-bottom: 1.5rem;">Total Price for ${users} users, including GST.</p>
-                            <ul style="font-size: 0.875rem; color: #6b7280; line-height: 1.5rem; text-align: left; padding-left: 1rem; display: inline-block;">
-                                <li>Base Price for ${users} users for ${years} years: <span style="font-weight: bold; color: #1f2937;">${formatCurrency(basePriceTotal)}</span></li>
-                                ${getBreakdownHtml()}
-                                <li style="border-top: 1px solid #e5e7eb; padding-top: 0.5rem; margin-top: 0.5rem;">Total Price (excl. GST): <span style="font-weight: bold; color: #1f2937;">${formatCurrency(data[`price${years}Y`])}</span></li>
-                                <li>Total GST (18%): <span style="font-weight: bold; color: #1f2937;">${formatCurrency(data[`price${years}Y_final`] - data[`price${years}Y`])}</span></li>
-                            </ul>
+                        <div class="print-body">
+                            <!-- FIRST YEAR PRICING -->
+                            <div class="print-data-table">
+                                <h2>First-Year Pricing (on First Order only)</h2>
+                                <table class="print-table">
+                                    <tr>
+                                        <td class="label">Base Rate Per User/Year</td>
+                                        <td class="value">${formatCurrency(basePricePerUser)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label">Total Base Price (${users} Users)</td>
+                                        <td class="value">${formatCurrency(basePricePerUser * users)}</td>
+                                    </tr>
+                                     <tr>
+                                        <td class="label">Discount (${year1DiscountPercentage.toFixed(2)}%)</td>
+                                        <td class="value">-${formatCurrency(year1DiscountAmount)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label">Taxable Amount</td>
+                                        <td class="value">${formatCurrency(firstYearTaxable)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label">GST (${(GST_RATE * 100).toFixed(0)}%)</td>
+                                        <td class="value">${formatCurrency(firstYearGST)}</td>
+                                    </tr>
+                                    <tr class="total-row">
+                                        <td class="label">Total First-Year Cost (inc. GST)</td>
+                                        <td class="value">${formatCurrency(firstYearTotal)}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- RENEWAL PRICING (only shows for > 1 year) -->
+                            ${renewalSectionHtml}
+
+                            <!-- NON-CONTRACT AND SAVINGS SUMMARY (always present, but placement might change if renewal is present) -->
+                            <div class="print-data-table" style="grid-column: ${renewalYears === 0 ? '2' : '1 / -1'};">
+                                <h2>Non-Contract & Savings Summary (${years} Years)</h2>
+                                <table class="print-table">
+                                    <tr>
+                                        <td class="label font-bold">Total Contract Price (inc. GST)</td>
+                                        <td class="value font-bold">${formatCurrency(contractPriceFinal)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label">Avg. Contract Cost / User / Year (Untaxed)</td>
+                                        <td class="value">${formatCurrency(avgContractCostPerUserPerYear)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label">Total Non-Contract Price (inc. GST)</td>
+                                        <td class="value">${formatCurrency(nonContractPriceFinal)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label">Avg. Non-Contract Cost / User / Year (Untaxed)</td>
+                                        <td class="value">${formatCurrency(avgNonContractCostPerUserPerYear)}</td>
+                                    </tr>
+                                    <tr class="savings-row">
+                                        <td class="label font-bold">Total Contract Savings vs. Non-Contract</td>
+                                        <td class="value">${formatCurrency(totalSavings)} (${totalSavingsPercent.toFixed(2)}%)</td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
-                        
-                        <div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e5e7eb; margin-bottom: 2rem; text-align: center;">
-                            <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem;">Non-Contract Pricing</h2>
-                            <p style="font-size: 2.5rem; font-weight: bold; color: #007aff;">${formatCurrency(getNonContractPrice())}</p>
-                            <p style="font-size: 1rem; color: #6b7280;">Total non-contract price for ${years} years, including GST.</p>
+
+                        <!-- FOOTER SECTION -->
+                        <div class="print-footer">
+                            <p>This proposal is related to the "Odoo Enterprise Subscription Agreement" available on <a href="https://www.odoo.com/r/enterprise-contract">https://www.odoo.com/r/enterprise-contract</a></p>
+                            <p>Note: Minor customizations are done through Odoo Studio, included in the custom plan. But major developments, like Python modules, might require an Odoo.sh cloud subscription. For more information, connect with your Account Manager.</p>
                         </div>
-                        
-                        ${years > 1 ? `<div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e5e7eb; margin-bottom: 2rem; text-align: center;">
-                            <h2 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem;">Savings Information</h2>
-                            <p style="font-size: 2.5rem; font-weight: bold; color: #22c55e; margin-bottom: 0.5rem;">${formatCurrency(data[`savings${years}Y`])}</p>
-                            <p style="font-size: 1rem; color: #6b7280; margin-bottom: 1.5rem;">Total savings over the contract duration.</p>
-                            <p style="font-size: 2.5rem; font-weight: bold; color: #22c55e; margin-bottom: 0.5rem;">${data[`savingsPercent${years}Y`].toFixed(2)}%</p>
-                            <p style="font-size: 1rem; color: #6b7280;">Savings rate compared to non-contract price.</p>
-                        </div>` : ''}
                     </div>
                 `;
 
@@ -982,6 +1077,9 @@
 
             printBtn.addEventListener('click', () => {
                 generatePrintReport(currentPlan, currentContract, parseInt(usersInput.value));
+            });
+             window.addEventListener('afterprint', () => {
+                printReportContainer.innerHTML = '';
             });
 
             updateUI();
