@@ -1,52 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Multi Year Contracts Cost Calculator</title>
-  <style>
-    .nav-container {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin: 20px 0;
-      flex-wrap: wrap;
-    }
-    .nav-btn {
-      text-decoration: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #4f46e5, #06b6d4);
-      color: white;
-      font-weight: 600;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
-    .nav-btn:hover {
-      background: linear-gradient(135deg, #06b6d4, #4f46e5);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-    }
-    .active {
-      background: linear-gradient(135deg, #4338ca, #0e7490);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
-      pointer-events: none;
-    }
-  </style>
-</head>
-<body>
-  <!-- Navigation -->
-  <div class="nav-container">
-    <a href="index.html" class="nav-btn">Yearly vs Monthly Price</a>
-    <a href="Multi_year_Contracts_Cost_Calculator.html" class="nav-btn active">Multi-Year Contracts</a>
-    <a href="Implementation_Service_Cost_Calculator.html" class="nav-btn">Implementation Service</a>
-  </div>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Odoo Multi-Years Contract Pricing Comparison</title>
@@ -85,6 +39,37 @@
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.6);
         }
+
+        /* Styles for the Global Navigation Tabs */
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .nav-btn {
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #06b6d4, #4f46e5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+        }
+        .nav-btn.active {
+            background: linear-gradient(135deg, #4338ca, #0e7490);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+            pointer-events: none;
+        }
+        /* End Global Navigation Tabs Styles */
 
         .tab-toggle-group {
             background: rgba(255, 255, 255, 0.7);
@@ -180,7 +165,8 @@
                 font-family: 'Inter', sans-serif;
                 color: #333;
             }
-            .main-container, .print-btn, .tooltip, .info-icon {
+            /* Hides the calculator UI, print button, tooltips, and most importantly, the .nav-container */
+            .main-container, .print-btn, .tooltip, .info-icon, .nav-container { 
                 display: none !important;
             }
             .print-report {
@@ -312,6 +298,13 @@
     </style>
 </head>
 <body class="p-6 md:p-10">
+    <!-- Global Navigation Tabs (Consolidated from the original file) -->
+    <div class="nav-container">
+        <a href="index.html" class="nav-btn">Yearly vs Monthly Price</a>
+        <a href="Multi_year_Contracts_Cost_Calculator.html" class="nav-btn active">Multi-Year Contracts</a>
+        <a href="Implementation_Service_Cost_Calculator.html" class="nav-btn">Implementation Service</a>
+    </div>
+
     <!-- Print Button (Visible in Browser, Hidden in Print) -->
     <button id="print-btn" class="print-btn">Print Your Report</button>
 
@@ -902,10 +895,17 @@
                     const contractRenewalPriceUntaxed = contractPriceUntaxed - firstYearTaxable;
                     const contractRenewalPrice = contractRenewalPriceUntaxed * (1 + GST_RATE);
                     
-                    const renewalDiscountRate = planType === 'standard' 
-                        ? standardPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`] 
-                        : customPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`];
-                    
+                    let renewalDiscountRate;
+                    if (planType === 'standard') {
+                        renewalDiscountRate = standardPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`] !== undefined 
+                            ? standardPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`] 
+                            : standardPlan.discounts.year2.years2; // Fallback for 2-year if key is wrong
+                    } else {
+                         renewalDiscountRate = customPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`] !== undefined 
+                            ? customPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`]
+                            : customPlan.discounts.year2.years2; // Fallback for 2-year if key is wrong
+                    }
+
                     renewalSectionHtml = `
                         <div class="print-data-table">
                             <h2>Renewal Pricing (${renewalYears} Years)</h2>
@@ -920,7 +920,7 @@
                                 </tr>
                                  <tr>
                                     <td class="label">Renewal Discount (${(renewalDiscountRate * 100).toFixed(2)}%)</td>
-                                    <td class="value">${formatCurrency(basePricePerUser * users * renewalYears * renewalDiscountRate)}</td>
+                                    <td class="value">-${formatCurrency(basePricePerUser * users * renewalYears * renewalDiscountRate)}</td>
                                 </tr>
                                 <tr>
                                     <td class="label">Taxable Amount</td>
@@ -942,7 +942,8 @@
                 const contractPriceFinal = data[`price${years}Y_final`];
                 const contractPriceUntaxed = contractPriceFinal / (1 + GST_RATE);
                 
-                const nonContractPriceFinal = data[`nonContract${years}Y_final`];
+                // For 1-year contract, nonContract and contract price are the same, so no savings calculation applies (it's 0)
+                const nonContractPriceFinal = data[`nonContract${years}Y_final`] || data.price1Y_final; 
                 const nonContractPriceUntaxed = nonContractPriceFinal / (1 + GST_RATE);
                 
                 const totalSavings = data[`savings${years}Y`] || 0;
