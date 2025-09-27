@@ -1,12 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Implementation Service Calculator</title>
+  <style>
+    .nav-container {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .nav-btn:hover {
+      background: linear-gradient(135deg, #06b6d4, #4f46e5);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+    }
+    .active {
+      background: linear-gradient(135deg, #4338ca, #0e7490);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <div class="nav-container">
+    <a href="index.html" class="nav-btn">Yearly vs Monthly Price</a>
+    <a href="Multi_year_Contracts_Cost_Calculator.html" class="nav-btn">Multi-Year Contracts</a>
+    <a href="Implementation_Service_Cost_Calculator.html" class="nav-btn active">Implementation Service</a>
+  </div>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Odoo Success Pack Calculator (Modern Bold Redesign)</title>
-    <!-- Load Inter font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -16,14 +60,14 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        'bold-header': '#2c3e50', // Dark but softer blue/gray for header
-                        'bold-bg': '#F4F7FA', // Very light gray background
-                        'bold-card': '#FFFFFF', // White cards
-                        'bold-primary': '#007AFF', // Modern iOS/web Blue for main branding/buttons
-                        'bold-secondary': '#5B5BEB', // Accent Purple (kept for dropdown arrow/links)
-                        'bold-success': '#28A745', // Standard Success Green for savings
-                        'bold-dark-text': '#34495E', // Dark text
-                        'bold-info': '#007AFF', // Vibrant Blue for Core Pricing Breakdown & Final Price
+                        'bold-header': '#2c3e50',
+                        'bold-bg': '#F4F7FA',
+                        'bold-card': '#FFFFFF',
+                        'bold-primary': '#007AFF',
+                        'bold-secondary': '#5B5BEB',
+                        'bold-success': '#28A745',
+                        'bold-dark-text': '#34495E',
+                        'bold-info': '#007AFF',
                     },
                     boxShadow: {
                         'soft': '0 4px 10px rgba(0, 0, 0, 0.05)',
@@ -34,32 +78,28 @@
         }
     </script>
     <style>
-        /* Base styling for the whole container */
         .calculator-container {
             max-width: 900px;
             margin: 0 auto;
         }
 
-        /* Custom styling for the select dropdown */
         .select-input {
-            /* Standard dropdown styling, keeping purple arrow for contrast/legacy */
+            /* Custom styling for the select dropdown */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235B5BEB'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 1rem center;
-            padding-right: 2.5rem !important; /* Make space for the icon */
-            appearance: none; /* Hide default arrow */
+            padding-right: 2.5rem !important;
+            appearance: none;
             cursor: pointer;
             border-radius: 8px;
             transition: all 0.2s ease;
         }
         
-        /* Focus state for select and input */
         .select-input:focus, input[type="number"]:focus {
             box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px theme('colors.bold-primary');
             border-color: theme('colors.bold-primary');
         }
         
-        /* Currency Segmented Control */
         .segmented-control {
             border: 1px solid #D1D5DB;
             padding: 4px;
@@ -82,13 +122,12 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* Custom styling for the large Final Price display */
         #finalPriceDisplay {
             color: theme('colors.bold-info'); 
             font-size: 2.5rem; 
             line-height: 1;
             font-weight: 900;
-            text-shadow: none; /* Removing text shadow for cleaner look */
+            text-shadow: none; 
             transition: all 0.5s ease;
         }
         @media (min-width: 768px) {
@@ -97,7 +136,6 @@
             }
         }
 
-        /* Core Pricing Breakdown value style */
         .core-price-value {
             color: theme('colors.bold-info');
             font-weight: 700;
@@ -130,17 +168,10 @@
 </head>
 <body class="bg-bold-bg min-h-screen font-sans antialiased">
 
-    <!-- Global Navigation (Simple Top Bar) -->
-    <nav class="flex justify-center gap-4 py-4 text-sm font-medium border-b border-gray-200 bg-white">
-        <a href="#" class="px-3 py-1 text-gray-600 hover:text-bold-primary transition-colors">Yearly vs Monthly Price</a>
-        <a href="#" class="px-3 py-1 text-gray-600 hover:text-bold-primary transition-colors">Multi-Year Contracts</a>
-        <a href="#" class="px-3 py-1 text-bold-primary font-bold border-b-2 border-bold-primary">Implementation Service</a>
-    </nav>
-
 
     <div class="calculator-container p-4 md:p-10">
 
-        <!-- Header Section (Modernized) -->
+        <!-- Header Section -->
         <header class="text-center mb-10 bg-bold-header text-white rounded-xl shadow-xl p-8 md:p-12">
             <h1 class="text-3xl md:text-5xl font-extrabold mb-2">Odoo Success Pack Calculator</h1>
             <p class="text-md md:text-lg text-gray-300">Compare Implementation Cost and Analyze NRR Target.</p>
@@ -156,9 +187,8 @@
                 
                 <!-- Implementation Hours Selector (Dropdown) -->
                 <div class="lg:col-span-2 space-y-4">
-                    <label for="hours" class="block text-sm font-medium text-gray-600">Success Pack (Hours)</label>
+                    <label for="hours" class="block text-sm font-bold text-gray-600">Success Pack (Hours)</label>
                     <select id="hours" class="select-input w-full p-3 border border-gray-300 bg-white text-bold-dark-text text-lg font-bold">
-                        <!-- Options generated dynamically or listed here -->
                         <option value="25">25 Hours</option>
                         <option value="50">50 Hours</option>
                         <option value="75">75 Hours</option>
@@ -176,13 +206,13 @@
 
                 <!-- Discount Input -->
                 <div class="space-y-4">
-                    <label for="discount" class="block text-sm font-medium text-gray-600">Discount (%)</label>
+                    <label for="discount" class="block text-sm font-bold text-gray-600">Discount (%)</label>
                     <div class="relative">
                         <input type="number" id="discount" value="15" min="0" max="100" class="w-full p-3 border border-gray-300 text-bold-dark-text text-center text-lg font-bold rounded-lg focus:ring-2 focus:ring-bold-primary focus:border-bold-primary pr-10">
                         <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-semibold">%</span>
                     </div>
                     
-                    <!-- Currency Selector (Modernized) -->
+                    <!-- Currency Selector -->
                     <div class="flex justify-center mt-4">
                         <div class="segmented-control flex" id="currency-selector">
                             <button id="btn-inr" class="active" data-currency="INR">₹ INR</button>
@@ -197,38 +227,35 @@
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
                 <!-- Standard Rate -->
-                <!-- Updated classes for cleaner, symmetric look: removed bg-bold-info/10 and border-bold-info/30 -->
                 <div class="p-4 bg-white rounded-lg border border-gray-200 shadow-soft">
-                    <span class="block text-xs font-medium uppercase text-gray-600 mb-1">Standard Rate</span>
+                    <span class="block text-xs font-bold uppercase text-gray-600 mb-1">Standard Rate</span>
                     <span class="value text-lg sm:text-2xl font-bold core-price-value" id="standardRate">₹0.00</span>
                 </div>
                 <!-- After Discount Price -->
                 <div class="p-4 bg-white rounded-lg border border-gray-200 shadow-soft">
-                    <span class="block text-xs font-medium uppercase text-gray-600 mb-1" id="afterDiscountLabel">After Discount (15%)</span>
+                    <span class="block text-xs font-bold uppercase text-gray-600 mb-1" id="afterDiscountLabel">After Discount (15%)</span>
                     <span class="value text-lg sm:text-2xl font-bold core-price-value" id="afterDiscountPrice">₹0.00</span>
                 </div>
                 <!-- Per Hour Rate -->
                 <div class="p-4 bg-white rounded-lg border border-gray-200 shadow-soft">
-                    <span class="block text-xs font-medium uppercase text-gray-600 mb-1">Per Hour Rate</span>
+                    <span class="block text-xs font-bold uppercase text-gray-600 mb-1">Per Hour Rate</span>
                     <span class="value text-lg sm:text-2xl font-bold core-price-value" id="perHourAfterDiscount">₹0.00</span>
                 </div>
                 <!-- GST (18%) -->
                 <div class="p-4 bg-white rounded-lg border border-gray-200 shadow-soft">
-                    <span class="block text-xs font-medium uppercase text-gray-600 mb-1">GST (18%)</span>
+                    <span class="block text-xs font-bold uppercase text-gray-600 mb-1">GST (18%)</span>
                     <span class="value text-lg sm:text-2xl font-bold core-price-value" id="gstAmount">₹0.00</span>
                 </div>
             </div>
 
             <!-- Final Investment and Total Saving (Central Focus) -->
             <div class="text-center my-10 border-t border-gray-200 pt-8">
-                <!-- Label uses bold-dark-text for contrast -->
                 <p class="text-sm font-semibold uppercase text-bold-dark-text mb-4">Final Investment (GST Included)</p>
-                <!-- Final price now uses the vibrant blue color (bold-info) and the updated size from custom CSS -->
                 <span id="finalPriceDisplay" class="value" id="finalPrice">₹0.00</span>
 
                 <!-- Savings Area -->
                 <div class="mt-6 inline-block p-3 rounded-lg bg-bold-success/10 border border-bold-success/30 shadow-md">
-                    <span class="block text-sm font-semibold uppercase text-bold-success mb-1">Total Saving</span>
+                    <span class="block text-sm font-bold uppercase text-bold-success mb-1">Total Saving</span>
                     <span class="value text-2xl font-extrabold text-bold-success" id="totalSaving">₹0.00</span>
                 </div>
             </div>
@@ -241,7 +268,7 @@
                 
                 <!-- Target Amount Input -->
                 <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-2">
-                    <label for="targetAmount" class="block text-sm font-medium text-gray-600">Enter Your Current NRR Target (USD)</label>
+                    <label for="targetAmount" class="block text-sm font-bold text-gray-600">Enter Your Current NRR Target (USD)</label>
                     <div class="relative">
                         <input type="number" id="targetAmount" value="0" min="0" class="w-full p-3 border border-gray-300 text-lg font-bold text-bold-dark-text text-center rounded-lg focus:ring-2 focus:ring-bold-primary focus:border-bold-primary pl-8">
                         <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-semibold">$</span>
@@ -250,18 +277,18 @@
 
                 <!-- Required Amount -->
                 <div class="p-4 rounded-lg border border-gray-200 text-center bg-white">
-                    <span class="block text-xs font-medium uppercase text-gray-500 mb-1">Amount to Reach NRR Target</span>
+                    <span class="block text-xs font-bold uppercase text-gray-500 mb-1">Amount to Reach NRR Target</span>
                     <span class="value text-lg sm:text-2xl font-bold text-red-500" id="requiredAmount">$0.00</span>
                 </div>
 
                 <!-- Percentage Achieved -->
                 <div class="p-4 rounded-lg border border-gray-200 text-center bg-white">
-                    <span class="block text-xs font-medium uppercase text-gray-500 mb-1">Target Achieved</span>
+                    <span class="block text-xs font-bold uppercase text-gray-500 mb-1">Target Achieved</span>
                     <span class="value text-lg sm:text-2xl font-bold text-bold-dark-text" id="percentageAchieved">0.00%</span>
                 </div>
             </div>
             
-            <!-- Action Button (Modernized) -->
+            <!-- Action Button -->
             <div class="flex justify-center mt-6">
                 <button onclick="generateReport()" class="w-full sm:w-auto bg-bold-primary hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg shadow-btn-subtle transition-all duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 -mt-0.5" viewBox="0 0 20 20" fill="currentColor">
@@ -283,7 +310,6 @@
             150: 518569, 175: 614139, 200: 694831, 225: 760401, 250: 850994,
             275: 946554, 300: 997247
         };
-        const ALL_HOURS = Object.keys(RATES_INR).map(h => parseInt(h));
 
         const USD_INR_RATE = 80; 
         let currentCurrency = 'INR';
@@ -292,7 +318,7 @@
         let currentHours = 100;
 
         // --- DOM Elements (Cached) ---
-        const hoursInput = document.getElementById('hours'); // The select dropdown
+        const hoursInput = document.getElementById('hours');
         const discountInput = document.getElementById('discount');
         const targetAmountInput = document.getElementById('targetAmount');
         const standardRateSpan = document.getElementById('standardRate');
@@ -300,13 +326,13 @@
         const afterDiscountPriceSpan = document.getElementById('afterDiscountPrice');
         const totalSavingSpan = document.getElementById('totalSaving');
         const gstAmountSpan = document.getElementById('gstAmount');
-        const finalPriceDisplay = document.getElementById('finalPriceDisplay'); // Used for large text
+        const finalPriceDisplay = document.getElementById('finalPriceDisplay');
         const perHourAfterDiscountSpan = document.getElementById('perHourAfterDiscount');
         const requiredAmountSpan = document.getElementById('requiredAmount');
         const percentageAchievedSpan = document.getElementById('percentageAchieved');
         const currencySelector = document.getElementById('currency-selector');
         
-        const ODOO_REPORT_LOGO_URL = "https://placehold.co/150x40/007AFF/ffffff?text=Odoo+Logo"; // Updated logo placeholder color
+        const ODOO_REPORT_LOGO_URL = "https://placehold.co/150x40/007AFF/ffffff?text=Odoo+Logo"; 
 
         // --- Utility Functions ---
 
@@ -328,7 +354,6 @@
             confettiContainer.className = 'confetti';
             document.body.appendChild(confettiContainer);
 
-            // Using the modern color scheme for confetti
             const colors = ['#007AFF', '#28A745', '#FFC107', '#5B5BEB'];
             const pieceCount = 50;
 
@@ -403,9 +428,8 @@
          * Core calculation and rendering function.
          */
         function calculateAndDraw(duration = 500) {
-            // Get hours value directly from the select dropdown
             const hours = parseFloat(hoursInput.value) || 0; 
-            currentHours = hours; // Update currentHours variable
+            currentHours = hours;
             
             const discountPercentage = parseFloat(discountInput.value) || 0;
             const targetAmountUSD = parseFloat(targetAmountInput.value) || 0;
@@ -433,7 +457,6 @@
             const displayRequiredAmountUSD = requiredAmountUSD < 0 ? 0 : requiredAmountUSD;
             let percentageAchieved = targetAmountUSD > 0 ? (afterDiscountPriceUSD / targetAmountUSD) * 100 : 0;
             
-            // Helper to get current displayed value, handling currency symbols
             const getCurrentValue = (span, isCurrency = true) => {
                 const text = span.textContent;
                 if (!isCurrency || text.includes('%')) return 0;
@@ -478,7 +501,7 @@
         }
 
         function setupEventListeners() {
-            // Dropdown change listener (replaces button click logic)
+            // Dropdown change listener
             hoursInput.addEventListener('change', () => calculateAndDraw(500));
             
             // Throttled input for Discount and Target Amount
@@ -543,7 +566,6 @@
                             border-bottom: 1px solid #ddd;
                             margin-bottom: 25px;
                         }
-                        /* Updated print header color to modern blue */
                         .report-header h2 { margin: 0; font-size: 20pt; color: #007AFF; font-weight: 700; } 
                         .report-table {
                             width: 100%;
@@ -563,11 +585,10 @@
                         .report-section { margin-bottom: 15px; }
                         .report-section strong { font-weight: 700; }
                         .report-footer { margin-top: 2rem; text-align: center; font-size: 9pt; color: #666; }
-                        /* Updated print color for Final Price to the new bold-info blue */
                         .final-price-row td {
                             font-size: 14pt;
                             font-weight: 700;
-                            color: #007AFF; /* Using the primary blue */
+                            color: #007AFF; 
                         }
                         .logo { height: 40px; }
                     </style>
