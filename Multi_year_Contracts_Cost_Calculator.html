@@ -131,6 +131,39 @@
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.1); opacity: 0.7; }
         }
+        
+        /* --- TOOLTIP STYLES --- */
+        /* Initially hide the tooltip content */
+        .tooltiptext {
+            visibility: hidden; 
+            opacity: 0;
+            width: 280px;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 10px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%; /* Position above the icon */
+            left: 50%;
+            margin-left: -140px; /* Center the tooltip */
+            transition: opacity 0.3s, visibility 0.3s;
+            font-size: 0.8rem;
+            font-weight: 400;
+            line-height: 1.4;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            white-space: nowrap; /* Prevent line breaks in the content */
+        }
+
+        /* Show the tooltiptext on hover or focus (for click/tab interaction) of the parent .tooltip element */
+        .tooltip:hover .tooltiptext, 
+        .tooltip:focus-within .tooltiptext,
+        .tooltip:focus .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* --- END TOOLTIP STYLES --- */
 
         .print-btn {
             position: fixed;
@@ -534,9 +567,10 @@
                 let contentHtml = '';
 
                 // HTML for the info icon and tooltip
+                // Added tabindex="0" to the .tooltip span to make it focusable/clickable
                 const infoIconHtml = `
                     <div class="inline-block relative">
-                        <span class="tooltip ml-2 cursor-pointer">
+                        <span class="tooltip ml-2 cursor-pointer" tabindex="0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="info-icon" viewBox="0 0 16 16">
                                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
                                 <path d="M8.93 6.588l.276-.276a.35.35 0 0 0-.464-.547c-.43.272-.943.513-1.465.753-.522.24-.87.525-1.07.828-.21.314-.265.656-.265 1.05a1.04 1.04 0 0 0 .194.611c.143.195.342.339.638.455.297.116.634.195 1.008.237a.35.35 0 0 0 .34-.467c-.126-.2-.31-.295-.582-.412-.272-.117-.468-.247-.59-.408-.12-.15-.18-.31-.18-.466 0-.323.23-.497.523-.623.292-.126.685-.188-1.18-.218.495-.03.888-.042 1.258-.042.35 0 .685.012.92.036.236.024.42.06.55.107.13.047.228.106.29.177.062.071.1.157.1.252 0 .142-.08.275-.25.405l-.265.233a.35.35 0 0 0-.466.547c.43-.272.943-.513 1.465-.753.522-.24.87-.525 1.07-.828.21-.314.265-.656.265-1.05a1.04 1.04 0 0 0-.194-.611c-.143-.195-.342-.339-.638-.455-.297-.116-.634-.195-1.008-.237a.35.35 0 0 0-.34.467c.126.2.31.295.582.412.272.117.468.247.59.408-.12.15-.18.31-.18.466 0-.323.23-.497.523-.623.292-.126.685-.188-1.18-.218z"/>
