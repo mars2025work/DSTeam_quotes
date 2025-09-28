@@ -40,36 +40,30 @@
             border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
-        /* Styles for the Global Navigation Tabs */
-        .nav-container {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
+        /* Navigation Button Styles */
         .nav-btn {
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            color: var(--primary-text);
             text-decoration: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #4f46e5, #06b6d4);
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: all 0.2s ease-in-out;
+            background: transparent;
         }
+
         .nav-btn:hover {
-            background: linear-gradient(135deg, #06b6d4, #4f46e5);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--primary-text);
         }
+
         .nav-btn.active {
-            background: linear-gradient(135deg, #4338ca, #0e7490);
-            box-shadow: 0 6px 14px rgba(0,0,0,0.25);
-            pointer-events: none;
+            color: white;
+            /* UPDATED: Changed from --odoo-purple to --apple-gradient to match duration buttons */
+            background: var(--apple-gradient); 
+            box-shadow: 0 4px 10px rgba(0, 122, 255, 0.4); /* Adjusted shadow for gradient */
+            font-weight: 600;
         }
-        /* End Global Navigation Tabs Styles */
 
         .tab-toggle-group {
             background: rgba(255, 255, 255, 0.7);
@@ -90,9 +84,9 @@
         }
 
         .tab-toggle-btn.active {
-            background: white;
-            color: var(--primary-text);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            color: white; 
+            background: var(--apple-gradient);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
         }
 
         .contract-btn {
@@ -111,6 +105,23 @@
             box-shadow: 0 6px 18px rgba(0, 122, 255, 0.4);
             transform: translateY(-2px);
         }
+        
+        .number-input {
+            padding: 0.75rem 0.5rem; 
+            border-radius: 9999px; 
+            font-weight: 600;
+            color: var(--primary-text);
+            background: var(--light-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+        .number-input::-webkit-outer-spin-button,
+        .number-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
 
         .highlight {
             background: var(--apple-gradient);
@@ -118,52 +129,68 @@
             -webkit-text-fill-color: transparent;
         }
 
+        /* Tooltip/Info Icon Styles */
         .info-icon {
-            animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
             background: var(--apple-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: inline-block;
             cursor: pointer;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.7; }
+            vertical-align: middle;
+            margin-left: 0.25rem;
         }
         
-        /* --- TOOLTIP STYLES --- */
-        /* Initially hide the tooltip content */
-        .tooltiptext {
-            visibility: hidden; 
-            opacity: 0;
-            width: 280px;
-            background-color: #333;
-            color: #fff;
-            text-align: left;
-            border-radius: 8px;
-            padding: 10px;
-            position: absolute;
-            z-index: 10;
-            bottom: 125%; /* Position above the icon */
-            left: 50%;
-            margin-left: -140px; /* Center the tooltip */
-            transition: opacity 0.3s, visibility 0.3s;
-            font-size: 0.8rem;
-            font-weight: 400;
-            line-height: 1.4;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            white-space: nowrap; /* Prevent line breaks in the content */
+        .tooltip {
+            position: relative;
+            display: inline-block;
         }
 
-        /* Show the tooltiptext on hover or focus (for click/tab interaction) of the parent .tooltip element */
-        .tooltip:hover .tooltiptext, 
-        .tooltip:focus-within .tooltiptext,
-        .tooltip:focus .tooltiptext {
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            opacity: 0;
+            width: 280px; 
+            background-color: var(--primary-text);
+            color: #fff;
+            text-align: left;
+            border-radius: 0.5rem;
+            padding: 12px 15px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%; 
+            left: 50%;
+            margin-left: -140px; 
+            transition: opacity 0.3s, visibility 0.3s;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 400;
+        }
+
+        /* Show tooltip on hover */
+        .tooltip:hover .tooltiptext {
             visibility: visible;
             opacity: 1;
         }
-        /* --- END TOOLTIP STYLES --- */
+        
+        /* Show tooltip when click-toggled (overrides hover rules for persistence) */
+        .tooltip .tooltiptext.visible-on-click {
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        /* Tooltip arrow */
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--primary-text) transparent transparent transparent;
+        }
+
 
         .print-btn {
             position: fixed;
@@ -191,15 +218,14 @@
                 -webkit-print-color-adjust: exact !important;
                 color-adjust: exact !important;
                 width: 210mm; 
-                height: 297mm; /* Ensure A4 height constraint */
+                height: 297mm;
                 margin: 0;
                 padding: 0;
-                font-size: 9.5pt; /* Smaller font for A4 fit */
+                font-size: 9.5pt;
                 font-family: 'Inter', sans-serif;
                 color: #333;
             }
-            /* Hides the calculator UI, print button, tooltips, and most importantly, the .nav-container */
-            .main-container, .print-btn, .tooltip, .info-icon, .nav-container { 
+            .main-container, .print-btn, .tooltip, .info-icon, .page-nav { /* Added .page-nav */
                 display: none !important;
             }
             .print-report {
@@ -208,7 +234,7 @@
                 position: relative;
                 box-sizing: border-box; 
                 height: 297mm;
-                overflow: hidden; /* Prevent extra pages */
+                overflow: hidden;
             }
             
             /* HEADER STYLES */
@@ -216,12 +242,14 @@
                 position: absolute;
                 top: 30px;
                 right: 30px;
-                width: 100px; /* Space for logo */
-                height: 35px;
+                width: 150px;
+                height: 50px;
             }
             .print-logo-container img {
-                height: 35px; 
+                height: 50px;
                 width: auto;
+                max-width: 100%; 
+                max-height: 100%;
             }
 
             .print-header {
@@ -246,11 +274,11 @@
                 font-weight: 600;
             }
 
-            /* BODY SECTIONS (Matching PDF Structure) */
+            /* BODY SECTIONS */
             .print-body {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                gap: 25px; /* Spacing between columns */
+                gap: 25px;
             }
 
             .print-data-table {
@@ -307,7 +335,7 @@
             }
             
             .print-table .savings-row .value {
-                color: #10b981; /* Green for savings */
+                color: #10b981;
                 font-size: 10.5pt;
                 font-weight: 800;
             }
@@ -331,16 +359,16 @@
     </style>
 </head>
 <body class="p-6 md:p-10">
-    <!-- Global Navigation Tabs (Consolidated from the original file) -->
-    <div class="nav-container">
-        <a href="index.html" class="nav-btn">Yearly vs Monthly Price</a>
-        <a href="Multi_year_Contracts_Cost_Calculator.html" class="nav-btn active">Multi-Year Contracts</a>
-        <a href="Implementation_Service_Cost_Calculator.html" class="nav-btn">Implementation Service</a>
-    </div>
-
     <!-- Print Button (Visible in Browser, Hidden in Print) -->
     <button id="print-btn" class="print-btn">Print Your Report</button>
 
+    <!-- Navigation Bar (Added) -->
+    <nav class="page-nav flex justify-center max-w-7xl mx-auto mb-10 pt-4 pb-2">
+        <a href="index.html" class="nav-btn">Yearly vs Monthly Price</a>
+        <a href="Multi_year_Contracts_Cost_Calculator.html" class="nav-btn active">Multi-Year Contracts</a>
+        <a href="Implementation_Service_Cost_Calculator.html" class="nav-btn">Implementation Service</a>
+    </nav>
+    
     <!-- Main Calculator UI (Visible in Browser, Hidden in Print) -->
     <div class="max-w-7xl mx-auto p-8 main-container">
         <header class="text-center mb-12">
@@ -359,8 +387,9 @@
             <div class="w-full">
                 <p class="text-lg font-medium text-gray-700 mb-2 text-center md:text-left">Number of Users:</p>
                 <div class="flex items-center gap-4">
-                    <input type="range" id="users-input" min="1" max="100" value="10" class="w-full max-w-sm">
-                    <input type="number" id="users-number-input" min="1" max="100" value="10" class="number-input">
+                    <!-- Adjusted max-w-lg for better responsiveness with the number input -->
+                    <input type="range" id="users-input" min="1" max="100" value="10" class="w-full max-w-lg">
+                    <input type="number" id="users-number-input" min="1" max="100" value="10" class="number-input w-20">
                 </div>
             </div>
         </div>
@@ -410,6 +439,28 @@
     <div id="print-report-container"></div>
     
     <script>
+        // Global function to toggle tooltip visibility on click
+        const toggleTooltip = (event) => {
+            event.stopPropagation();
+            const tooltip = event.currentTarget;
+            const tooltipText = tooltip.querySelector('.tooltiptext');
+
+            if (!tooltipText) return;
+
+            // Toggle a class for click persistence
+            tooltipText.classList.toggle('visible-on-click');
+        };
+
+        // Global listener to hide all click-visible tooltips when clicking anywhere else
+        document.addEventListener('click', (e) => {
+            document.querySelectorAll('.tooltip .tooltiptext').forEach(tt => {
+                // Hide if the click target is outside the currently visible tooltip
+                if (tt.classList.contains('visible-on-click') && !e.target.closest('.tooltip')) {
+                    tt.classList.remove('visible-on-click');
+                }
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             const standardPlan = {
                 basePrice: 8700,
@@ -452,6 +503,47 @@
             let savingsChartInstance;
 
             const formatCurrency = (num) => num.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            
+            // Helper function to generate the Renewal Info Icon and Tooltip
+            const getRenewalInfoHtml = (planType, years, users) => {
+                const basePricePerUser = planType === 'standard' ? standardPlan.basePrice : customPlan.basePrice;
+                const renewalYears = years - 1;
+                let renewalDiscountRate;
+                
+                if (years === 2) {
+                    renewalDiscountRate = planType === 'standard' ? standardPlan.discounts.year2.years2 : customPlan.discounts.year2.years2;
+                } else {
+                    // Correctly map multi-year discounts for 3, 4, and 5 years
+                    const discountKey = `years2_${years > 2 ? years : ''}`;
+                    renewalDiscountRate = planType === 'standard' 
+                        ? standardPlan.discounts[`year${years}`][discountKey] 
+                        : customPlan.discounts[`year${years}`][discountKey];
+                }
+
+                const totalRenewalBasePrice = basePricePerUser * users * renewalYears;
+                const renewalDiscountAmount = totalRenewalBasePrice * renewalDiscountRate;
+                const discountedRenewalPrice = totalRenewalBasePrice - renewalDiscountAmount;
+                const renewalPeriod = renewalYears > 1 ? `Years 2-${years}` : `Year 2`;
+                
+                return `
+                    <div class="inline-block relative tooltip cursor-pointer" onclick="toggleTooltip(event)">
+                        <!-- Lightbulb SVG Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="info-icon" viewBox="0 0 16 16">
+                            <path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.18-.352.421-.426.657M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m-.276 5.611c-.552-.167-.935-.615-.935-1.111 0-.547.41-.953.945-.992l.006-.001a1.05 1.05 0 0 1 .271 0c.552.167.935.615.935 1.111 0 .547-.41.953-.945.992l-.006.001a1.05 1.05 0 0 1-.271 0zM5.5 12h5A2.5 2.5 0 0 1 8 14.5a2.5 2.5 0 0 1-2.5-2.5z"/>
+                            <path d="M4.174 10.31c-.702-.455-1.173-1.1-1.174-1.849 0-.986.732-1.765 1.637-2.025l.004-.001a2.05 2.05 0 0 1 .53-.082l.005.001c.905.26 1.637 1.039 1.637 2.025 0 .748-.472 1.393-1.174 1.849a2.05 2.05 0 0 1-.53.082M11.826 10.31c.702-.455 1.173-1.1 1.174-1.849 0-.986-.732-1.765-1.637-2.025l-.004-.001a2.05 2.05 0 0 1-.53-.082l-.005.001c-.905.26-1.637 1.039-1.637 2.025 0 .748.472 1.393 1.174 1.849a2.05 2.05 0 0 1 .53.082z"/>
+                        </svg>
+                        <span class="tooltiptext">
+                            <strong>Renewal Period Cost Breakdown:</strong><br>
+                            This calculation applies to the discounted price for the **${renewalPeriod}** renewal years.<br>
+                            <br>
+                            Base Price for Renewal Period: ${formatCurrency(totalRenewalBasePrice)}<br>
+                            Discount Applied (${(renewalDiscountRate * 100).toFixed(2)}%): -${formatCurrency(renewalDiscountAmount)}<br>
+                            <hr style="margin: 4px 0;">
+                            Discounted Price (Excl. GST): ${formatCurrency(discountedRenewalPrice)}
+                        </span>
+                    </div>
+                `;
+            };
 
             const calculateStandard = (users) => {
                 const basePrice = standardPlan.basePrice * users;
@@ -566,23 +658,28 @@
                 
                 let contentHtml = '';
 
-                // HTML for the info icon and tooltip
-                // Added tabindex="0" to the .tooltip span to make it focusable/clickable
-                const infoIconHtml = `
-                    <div class="inline-block relative">
-                        <span class="tooltip ml-2 cursor-pointer" tabindex="0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="info-icon" viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                <path d="M8.93 6.588l.276-.276a.35.35 0 0 0-.464-.547c-.43.272-.943.513-1.465.753-.522.24-.87.525-1.07.828-.21.314-.265.656-.265 1.05a1.04 1.04 0 0 0 .194.611c.143.195.342.339.638.455.297.116.634.195 1.008.237a.35.35 0 0 0 .34-.467c-.126-.2-.31-.295-.582-.412-.272-.117-.468-.247-.59-.408-.12-.15-.18-.31-.18-.466 0-.323.23-.497.523-.623.292-.126.685-.188-1.18-.218.495-.03.888-.042 1.258-.042.35 0 .685.012.92.036.236.024.42.06.55.107.13.047.228.106.29.177.062.071.1.157.1.252 0 .142-.08.275-.25.405l-.265.233a.35.35 0 0 0-.466.547c.43-.272.943-.513 1.465-.753.522-.24.87-.525 1.07-.828.21-.314.265-.656.265-1.05a1.04 1.04 0 0 0-.194-.611c-.143-.195-.342-.339-.638-.455-.297-.116-.634-.195-1.008-.237a.35.35 0 0 0-.34.467c.126.2.31.295.582.412.272.117.468.247.59.408-.12.15-.18.31-.18.466 0-.323.23-.497.523-.623.292-.126.685-.188-1.18-.218z"/>
-                            </svg>
-                            <span class="tooltiptext">
-                                Base Price for ${users} users for ${years} years:<br>
-                                ${users} users x ${formatCurrency(basePricePerUser)}/user x ${years} years =<br>
-                                ${formatCurrency(basePriceTotal)}
-                            </span>
+                // HTML for the initial Base Price info icon and tooltip
+                const basePriceInfoHtml = `
+                    <div class="inline-block relative tooltip cursor-pointer" onclick="toggleTooltip(event)">
+                        <!-- Lightbulb SVG Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="info-icon" viewBox="0 0 16 16">
+                            <path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.18-.352.421-.426.657M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m-.276 5.611c-.552-.167-.935-.615-.935-1.111 0-.547.41-.953.945-.992l.006-.001a1.05 1.05 0 0 1 .271 0c.552.167.935.615.935 1.111 0 .547-.41.953-.945.992l-.006.001a1.05 1.05 0 0 1-.271 0zM5.5 12h5A2.5 2.5 0 0 1 8 14.5a2.5 2.5 0 0 1-2.5-2.5z"/>
+                            <path d="M4.174 10.31c-.702-.455-1.173-1.1-1.174-1.849 0-.986.732-1.765 1.637-2.025l.004-.001a2.05 2.05 0 0 1 .53-.082l.005.001c.905.26 1.637 1.039 1.637 2.025 0 .748-.472 1.393-1.174 1.849a2.05 2.05 0 0 1-.53.082M11.826 10.31c.702-.455 1.173-1.1 1.174-1.849 0-.986-.732-1.765-1.637-2.025l-.004-.001a2.05 2.05 0 0 1-.53-.082l-.005.001c-.905.26-1.637 1.039-1.637 2.025 0 .748.472 1.393 1.174 1.849a2.05 2.05 0 0 1 .53.082z"/>
+                        </svg>
+                        <span class="tooltiptext">
+                            <strong>Base Annual Cost Calculation:</strong><br>
+                            This value represents the total gross cost for the full contract duration before any discounts or taxes are applied.<br>
+                            <br>
+                            Calculation:<br>
+                            ${users} users &times; ${formatCurrency(basePricePerUser)} (Cost per User/Year) &times; ${years} years<br>
+                            = ${formatCurrency(basePriceTotal)}
                         </span>
                     </div>
                 `;
+                
+                // Determine the renewal info HTML only for multi-year contracts
+                const renewalInfoHtml = years > 1 ? getRenewalInfoHtml(planType, years, users) : '';
+
 
                 if (contractDuration === '1year') {
                     contentHtml = `
@@ -593,23 +690,26 @@
                             <div class="mt-4 p-4 card rounded-xl text-left">
                                 <h4 class="text-lg font-semibold text-gray-900 mb-2">Breakdown</h4>
                                 <ul class="text-sm text-gray-600 space-y-1">
-                                    <li>Base Price for ${users} users for 1 year: ${formatCurrency(basePriceTotal)} ${infoIconHtml}</li>
+                                    <li>Base Price for ${users} users (${years} year contract): ${formatCurrency(basePriceTotal)} ${basePriceInfoHtml}</li>
                                     <li>Year 1 (${planType === 'standard' ? `${(standardPlan.discounts.year1 * 100).toFixed(0)}%` : `${customPlan.discounts.year1_percent.toFixed(2)}%`} discount): <span class="font-bold text-gray-800">${formatCurrency(data.price1Y)}</span></li>
-                                    <li class="border-t border-gray-300 pt-2 mt-2">Subtotal: <span class="font-bold text-gray-800">${formatCurrency(data.price1Y)}</span></li>
+                                    <li class="border-t border-gray-300 pt-2 mt-2">Subtotal (Excl. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price1Y)}</span></li>
                                     <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price1Y_final - data.price1Y)}</span></li>
                                 </ul>
                             </div>
                         </div>
                     `;
                 } else if (contractDuration === '2year') {
+                    const renewalDiscountDisplay = planType === 'standard' ? `Year 2 (${(standardPlan.discounts.year2.years2 * 100).toFixed(2)}% discount)` : `Year 2 (${(customPlan.discounts.year2.years2 * 100).toFixed(2)}% discount)`;
+                    
                     const breakdownText = planType === 'standard' ? `
                         <li>Year 1 (${(standardPlan.discounts.year2.year1 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2 (${(standardPlan.discounts.year2.years2 * 100).toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_discounted)}</span></li>
+                        <li>${renewalDiscountDisplay}: <span class="font-bold text-gray-800">${formatCurrency(data.year2_discounted)}</span> ${renewalInfoHtml}</li>
                     ` : `
                         <li>Year 1 (${customPlan.discounts.year1_percent.toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2 (${(customPlan.discounts.year2.years2 * 100).toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_discounted)}</span></li>
+                        <li>${renewalDiscountDisplay}: <span class="font-bold text-gray-800">${formatCurrency(data.year2_discounted)}</span> ${renewalInfoHtml}</li>
                     `;
                     const avgYearlyCost = data.price2Y_final / 2;
+                    
                     contentHtml = `
                         <div class="text-center">
                             <h3 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">2-Year Plan Price</h3>
@@ -619,12 +719,12 @@
                                 <div class="p-4 card rounded-xl">
                                     <h4 class="text-lg font-semibold text-gray-900 mb-2">Breakdown</h4>
                                     <ul class="text-sm text-gray-600 space-y-1">
-                                        <li>Base Price for ${users} users for 2 years: ${formatCurrency(basePriceTotal)} ${infoIconHtml}</li>
+                                        <li>Base Price for ${users} users (${years} year contract): ${formatCurrency(basePriceTotal)} ${basePriceInfoHtml}</li>
                                         ${breakdownText}
-                                        <li class="border-t border-gray-300 pt-2 mt-2">Subtotal: <span class="font-bold text-gray-800">${formatCurrency(data.price2Y)}</span></li>
+                                        <li class="border-t border-gray-300 pt-2 mt-2">Subtotal (Excl. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price2Y)}</span></li>
                                         <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price2Y_final - data.price2Y)}</span></li>
-                                        <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price2Y_final)}</span></li>
-                                        <li class="font-semibold text-gray-800">Average Yearly Cost (inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
+                                        <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (Inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price2Y_final)}</span></li>
+                                        <li class="font-semibold text-gray-800">Average Yearly Cost (Inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
                                     </ul>
                                 </div>
                                 <div class="p-4 card rounded-xl">
@@ -639,14 +739,17 @@
                         </div>
                     `;
                 } else if (contractDuration === '3year') {
+                     const renewalDiscountDisplay = planType === 'standard' ? `Years 2-3 (${(standardPlan.discounts.year3.years2_3 * 100).toFixed(0)}% discount)` : `Years 2-3 (${(customPlan.discounts.year3.years2_3 * 100).toFixed(0)}% discount)`;
+
                     const breakdownText = planType === 'standard' ? `
                         <li>Year 1 (${(standardPlan.discounts.year3.year1 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2-3 (${(standardPlan.discounts.year3.years2_3 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_3_discounted)}</span></li>
+                        <li>${renewalDiscountDisplay}: <span class="font-bold text-gray-800">${formatCurrency(data.year2_3_discounted * 2)}</span> ${renewalInfoHtml}</li>
                     ` : `
                         <li>Year 1 (${customPlan.discounts.year1_percent.toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2-3 (${(customPlan.discounts.year3.years2_3 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_3_discounted)}</span></li>
+                        <li>${renewalDiscountDisplay}: <span class="font-bold text-gray-800">${formatCurrency(data.year2_3_discounted * 2)}</span> ${renewalInfoHtml}</li>
                     `;
                     const avgYearlyCost = data.price3Y_final / 3;
+                    
                     contentHtml = `
                         <div class="text-center">
                             <h3 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">3-Year Plan Price</h3>
@@ -656,12 +759,12 @@
                                 <div class="p-4 card rounded-xl">
                                     <h4 class="text-lg font-semibold text-gray-900 mb-2">Breakdown</h4>
                                     <ul class="text-sm text-gray-600 space-y-1">
-                                        <li>Base Price for ${users} users for 3 years: ${formatCurrency(basePriceTotal)} ${infoIconHtml}</li>
+                                        <li>Base Price for ${users} users (${years} year contract): ${formatCurrency(basePriceTotal)} ${basePriceInfoHtml}</li>
                                         ${breakdownText}
-                                        <li class="border-t border-gray-300 pt-2 mt-2">Subtotal: <span class="font-bold text-gray-800">${formatCurrency(data.price3Y)}</span></li>
+                                        <li class="border-t border-gray-300 pt-2 mt-2">Subtotal (Excl. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price3Y)}</span></li>
                                         <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price3Y_final - data.price3Y)}</span></li>
-                                        <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price3Y_final)}</span></li>
-                                        <li class="font-semibold text-gray-800">Average Yearly Cost (inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
+                                        <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (Inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price3Y_final)}</span></li>
+                                        <li class="font-semibold text-gray-800">Average Yearly Cost (Inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
                                     </ul>
                                 </div>
                                 <div class="p-4 card rounded-xl">
@@ -676,14 +779,17 @@
                         </div>
                     `;
                 } else if (contractDuration === '4year') {
+                    const renewalDiscountDisplay = planType === 'standard' ? `Years 2-4 (${(standardPlan.discounts.year4.years2_4 * 100).toFixed(2)}% discount)` : `Years 2-4 (${(customPlan.discounts.year4.years2_4 * 100).toFixed(2)}% discount)`;
+
                     const breakdownText = planType === 'standard' ? `
                         <li>Year 1 (${(standardPlan.discounts.year4.year1 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2-4 (${(standardPlan.discounts.year4.years2_4 * 100).toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_4_discounted)}</span></li>
+                        <li>${renewalDiscountDisplay}: <span class="font-bold text-gray-800">${formatCurrency(data.year2_4_discounted * 3)}</span> ${renewalInfoHtml}</li>
                     ` : `
                         <li>Year 1 (${customPlan.discounts.year1_percent.toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2-4 (${(customPlan.discounts.year4.years2_4 * 100).toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_4_discounted)}</span></li>
+                        <li>${renewalDiscountDisplay}: <span class="font-bold text-gray-800">${formatCurrency(data.year2_4_discounted * 3)}</span> ${renewalInfoHtml}</li>
                     `;
                     const avgYearlyCost = data.price4Y_final / 4;
+                    
                     contentHtml = `
                         <div class="text-center">
                             <h3 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">4-Year Plan Price</h3>
@@ -693,12 +799,12 @@
                                 <div class="p-4 card rounded-xl">
                                     <h4 class="text-lg font-semibold text-gray-900 mb-2">Breakdown</h4>
                                     <ul class="text-sm text-gray-600 space-y-1">
-                                        <li>Base Price for ${users} users for 4 years: ${formatCurrency(basePriceTotal)} ${infoIconHtml}</li>
+                                        <li>Base Price for ${users} users (${years} year contract): ${formatCurrency(basePriceTotal)} ${basePriceInfoHtml}</li>
                                         ${breakdownText}
-                                        <li class="border-t border-gray-300 pt-2 mt-2">Subtotal: <span class="font-bold text-gray-800">${formatCurrency(data.price4Y)}</span></li>
+                                        <li class="border-t border-gray-300 pt-2 mt-2">Subtotal (Excl. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price4Y)}</span></li>
                                         <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price4Y_final - data.price4Y)}</span></li>
-                                        <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price4Y_final)}</span></li>
-                                        <li class="font-semibold text-gray-800">Average Yearly Cost (inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
+                                        <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (Inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price4Y_final)}</span></li>
+                                        <li class="font-semibold text-gray-800">Average Yearly Cost (Inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
                                     </ul>
                                 </div>
                                 <div class="p-4 card rounded-xl">
@@ -713,14 +819,17 @@
                         </div>
                     `;
                 } else if (contractDuration === '5year') {
+                    const renewalDiscountDisplay = planType === 'standard' ? `Years 2-5 (${(standardPlan.discounts.year5.years2_5 * 100).toFixed(0)}% discount)` : `Years 2-5 (${(customPlan.discounts.year5.years2_5 * 100).toFixed(0)}% discount)`;
+
                     const breakdownText = planType === 'standard' ? `
                         <li>Year 1 (${(standardPlan.discounts.year5.year1 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2-5 (${(standardPlan.discounts.year5.years2_5 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_5_discounted)}</span></li>
+                        <li>${renewalDiscountDisplay}: <span class="font-bold text-gray-800">${formatCurrency(data.year2_5_discounted * 4)}</span> ${renewalInfoHtml}</li>
                     ` : `
                         <li>Year 1 (${customPlan.discounts.year1_percent.toFixed(2)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year1Discounted)}</span></li>
-                        <li>Year 2-5 (${(customPlan.discounts.year5.years2_5 * 100).toFixed(0)}% discount): <span class="font-bold text-gray-800">${formatCurrency(data.year2_5_discounted)}</span></li>
+                        <li>${renewalDiscountDisplay}: <span class="font-bold text-gray-800">${formatCurrency(data.year2_5_discounted * 4)}</span> ${renewalInfoHtml}</li>
                     `;
                     const avgYearlyCost = data.price5Y_final / 5;
+                    
                     contentHtml = `
                         <div class="text-center">
                             <h3 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">5-Year Plan Price</h3>
@@ -730,12 +839,12 @@
                                 <div class="p-4 card rounded-xl">
                                     <h4 class="text-lg font-semibold text-gray-900 mb-2">Breakdown</h4>
                                     <ul class="text-sm text-gray-600 space-y-1">
-                                        <li>Base Price for ${users} users for 5 years: ${formatCurrency(basePriceTotal)} ${infoIconHtml}</li>
+                                        <li>Base Price for ${users} users (${years} year contract): ${formatCurrency(basePriceTotal)} ${basePriceInfoHtml}</li>
                                         ${breakdownText}
-                                        <li class="border-t border-gray-300 pt-2 mt-2">Subtotal: <span class="font-bold text-gray-800">${formatCurrency(data.price5Y)}</span></li>
+                                        <li class="border-t border-gray-300 pt-2 mt-2">Subtotal (Excl. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price5Y)}</span></li>
                                         <li>+ 18% GST: <span class="font-bold text-gray-800">${formatCurrency(data.price5Y_final - data.price5Y)}</span></li>
-                                        <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price5Y_final)}</span></li>
-                                        <li class="font-semibold text-gray-800">Average Yearly Cost (inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
+                                        <li class="border-t border-gray-300 pt-2 mt-2 font-semibold text-gray-800">Total Price (Inc. GST): <span class="font-bold text-gray-800">${formatCurrency(data.price5Y_final)}</span></li>
+                                        <li class="font-semibold text-gray-800">Average Yearly Cost (Inc. GST): <span class="font-bold text-green-600">${formatCurrency(avgYearlyCost)}</span></li>
                                     </ul>
                                 </div>
                                 <div class="p-4 card rounded-xl">
@@ -755,7 +864,7 @@
             
             const renderNonContractSummary = (planType, users) => {
                 const data = planType === 'standard' ? calculateStandard(users) : calculateCustom(users);
-                const basePrice = planType === 'standard' ? standardPlan.basePrice : customPlan.basePrice;
+                // Renamed 'basePrice' to 'basePricePerUser' to avoid confusion, though not used in calculations here
                 const years = parseInt(currentContract.replace('year', ''));
                 let nonContractPrice;
                 if (currentContract === '1year') {
@@ -779,7 +888,7 @@
                             <h4 class="text-lg font-semibold text-gray-900 mb-2">${years}-Year Non-Contract Price</h4>
                             <p class="text-3xl font-bold highlight">${formatCurrency(nonContractPrice)}</p>
                             <ul class="text-sm text-gray-600 mt-2">
-                                <li>Price (excl. GST): <span class="font-bold">${formatCurrency(nonContractExclGST)}</span></li>
+                                <li>Price (Excl. GST): <span class="font-bold">${formatCurrency(nonContractExclGST)}</span></li>
                                 <li>+ 18% GST: <span class="font-bold">${formatCurrency(nonContractGST)}</span></li>
                                 <li class="mt-2 text-xs text-gray-500">Includes Year 1 discount and regular price for remaining years.</li>
                             </ul>
@@ -794,7 +903,6 @@
                 const currencyFormatter = (value) => formatCurrency(value);
                 const savingsFormatter = (value) => `${value.toFixed(2)}%`;
                 
-                // Total price comparison for only the selected plan vs. non-contract
                 let totalLabels = ['Contract Price', 'Non-Contract Price'];
                 let totalData = [];
                 let totalColors = ['#9b51e0', '#d1d5db'];
@@ -925,21 +1033,20 @@
 
                 // Generate renewal section for contracts longer than 1 year
                 if (renewalYears > 0) {
-                    const contractPriceUntaxed = data[`price${years}Y`] || data.price1Y;
+                    const contractPriceUntaxed = data[`price${years}Y`];
                     const contractRenewalPriceUntaxed = contractPriceUntaxed - firstYearTaxable;
                     const contractRenewalPrice = contractRenewalPriceUntaxed * (1 + GST_RATE);
                     
                     let renewalDiscountRate;
-                    if (planType === 'standard') {
-                        renewalDiscountRate = standardPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`] !== undefined 
-                            ? standardPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`] 
-                            : standardPlan.discounts.year2.years2; // Fallback for 2-year if key is wrong
+                    if (years === 2) {
+                        renewalDiscountRate = planType === 'standard' ? standardPlan.discounts.year2.years2 : customPlan.discounts.year2.years2;
                     } else {
-                         renewalDiscountRate = customPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`] !== undefined 
-                            ? customPlan.discounts[`year${years}`][`years2_${years > 2 ? years : ''}`]
-                            : customPlan.discounts.year2.years2; // Fallback for 2-year if key is wrong
+                        const discountKey = `years2_${years > 2 ? years : ''}`;
+                        renewalDiscountRate = planType === 'standard' 
+                            ? standardPlan.discounts[`year${years}`][discountKey] 
+                            : customPlan.discounts[`year${years}`][discountKey];
                     }
-
+                    
                     renewalSectionHtml = `
                         <div class="print-data-table">
                             <h2>Renewal Pricing (${renewalYears} Years)</h2>
@@ -954,7 +1061,7 @@
                                 </tr>
                                  <tr>
                                     <td class="label">Renewal Discount (${(renewalDiscountRate * 100).toFixed(2)}%)</td>
-                                    <td class="value">-${formatCurrency(basePricePerUser * users * renewalYears * renewalDiscountRate)}</td>
+                                    <td class="value">${formatCurrency(basePricePerUser * users * renewalYears * renewalDiscountRate)}</td>
                                 </tr>
                                 <tr>
                                     <td class="label">Taxable Amount</td>
@@ -974,10 +1081,8 @@
                 }
                 
                 const contractPriceFinal = data[`price${years}Y_final`];
+                const nonContractPriceFinal = data[`nonContract${years}Y_final`];
                 const contractPriceUntaxed = contractPriceFinal / (1 + GST_RATE);
-                
-                // For 1-year contract, nonContract and contract price are the same, so no savings calculation applies (it's 0)
-                const nonContractPriceFinal = data[`nonContract${years}Y_final`] || data.price1Y_final; 
                 const nonContractPriceUntaxed = nonContractPriceFinal / (1 + GST_RATE);
                 
                 const totalSavings = data[`savings${years}Y`] || 0;
@@ -990,8 +1095,9 @@
 
                 const reportHtml = `
                     <div class="print-report">
+                        <!-- Added Odoo Logo here -->
                         <div class="print-logo-container">
-                            <img src="https://www.odoo.com/assets/3.0/img/odoo_logo_wordmark_positive.svg" alt="Odoo Logo">
+                            <img src="https://odoocdn.com/openerp_website/static/src/img/assets/svg/odoo_logo.svg" alt="Odoo Logo">
                         </div>
                         <div class="print-header">
                             <div class="print-title">
